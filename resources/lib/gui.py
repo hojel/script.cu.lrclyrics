@@ -136,7 +136,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             lyrics_file.close()
             return True
         except IOError:
-            LOG( LOG_ERROR, "%s %s::%s (%d) [%s]", __addonname__, self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ], )
+            log( "%s::%s (%d) [%s]" % (self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ]) )
             return False
 
     def show_lyrics( self, lyrics, save=False ):
@@ -228,7 +228,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     song = os.path.splitext( basename )[ 0 ].split( " ", 1 )[ 1 ]
         except:
             # invalid format selected
-            LOG( LOG_ERROR, "%s %s::%s (%d) [%s]", __addonname__, self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ], )
+            log( "%s::%s (%d) [%s]" % (self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ]) )
         return artist, song
 
     def getMyPlayer( self ):
@@ -236,7 +236,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.myPlayerChanged( 2 )
 
     def myPlayerChanged( self, event, force_update=False ):
-        #LOG( LOG_DEBUG, "%s GUI::myPlayerChanged [%s]", __scriptname__, [ "stopped","ended","started" ][ event ] )
+        #log( "GUI::myPlayerChanged [%s]" % ([ "stopped","ended","started" ][ event ]) )
         if ( event < 2 ): 
             self.exit_script()
         else:

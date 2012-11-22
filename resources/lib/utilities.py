@@ -6,9 +6,10 @@ import xbmc, xbmcgui, xbmcvfs
 
 DEBUG_MODE = 4
 
-__addon__   = sys.modules[ "__main__" ].__addon__
-__cwd__   = sys.modules[ "__main__" ].__cwd__
-__profile__ = sys.modules[ "__main__" ].__profile__
+__addon__     = sys.modules[ "__main__" ].__addon__
+__addonname__ = sys.modules[ "__main__" ].__addonname__
+__cwd__       = sys.modules[ "__main__" ].__cwd__
+__profile__   = sys.modules[ "__main__" ].__profile__
 
 # comapatble versions
 SETTINGS_VERSIONS = ( "1.7", )
@@ -34,8 +35,6 @@ ACTION_SETTINGS_MENU = ( 117, )
 ACTION_SHOW_CREDITS = ( 122, )
 ACTION_MOVEMENT_UP = ( 3, )
 ACTION_MOVEMENT_DOWN = ( 4, )
-# Log status codes
-LOG_INFO, LOG_ERROR, LOG_NOTICE, LOG_DEBUG = range( 1, 5 )
 
 def _create_base_paths():
     """ creates the base folders """
@@ -80,9 +79,11 @@ def get_browse_dialog( default="", heading="", dlg_type=1, shares="files", mask=
     value = dialog.browse( dlg_type, heading, shares, mask, use_thumbs, treat_as_folder, default )
     return value
 
-def LOG( status, format, *args ):
-    if ( DEBUG_MODE >= status ):
-        xbmc.output( "%s: %s\n" % ( ( "INFO", "ERROR", "NOTICE", "DEBUG", )[ status - 1 ], format % args, ) )
+def log(txt):
+    if isinstance (txt,str):
+        txt = txt.decode("utf-8")
+    message = u'%s: %s' % (__addonname__, txt)
+    xbmc.log(msg=message.encode("utf-8"), level=xbmc.LOGDEBUG)
 
 def get_settings():
     settings = {}
@@ -117,6 +118,3 @@ def get_textfile(filepath):
         return data
     except IOError:
         return ""
-
-def log(msg):
-    xbmc.log("### [%s] - %s" % (__scriptname__,msg,),level=xbmc.LOGDEBUG )
