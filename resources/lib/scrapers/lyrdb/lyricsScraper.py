@@ -12,7 +12,6 @@ import random
 import codecs
 
 __title__ = "lyrdb.com"
-__allow_exceptions__ = False
 
 class LyricsFetcher:
     def __init__( self ):

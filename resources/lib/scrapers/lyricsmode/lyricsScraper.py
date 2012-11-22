@@ -4,9 +4,7 @@ import urllib
 import re
 from utilities import *
 
-__language__ = sys.modules[ "__main__" ].__language__
-__title__ = __language__(30006)
-__service__ = 'lyricsmode'
+__title__ = 'lyricsmode'
 
 class LyricsFetcher:
     def __init__( self ):
@@ -17,12 +15,12 @@ class LyricsFetcher:
         self.next_results_regex = re.compile("<A href=\"([^\"]+)\" class=\"pages\">next .</A>", re.IGNORECASE)
 
     def get_lyrics(self, artist, song):
-        log( "%s: searching lyrics for %s - %s" % (__service__, artist, song))
+        log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
         try: # below is borowed from XBMC Lyrics
             url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace(" ","_"), song.lower().replace(" ","_"))
             lyrics_found = False
             while True:
-                log( "%s: search url: %s" % (__service__, url))
+                log( "%s: search url: %s" % (__title__, url))
                 song_search = urllib.urlopen(url).read()
                 if song_search.find("<div id='songlyrics_h' class='dn'>") >= 0:
                     break
@@ -54,7 +52,7 @@ class LyricsFetcher:
                         if match:
                             url = "http://www.lyricsmode.com/search.php" + match.group(1)
                         else:
-                            return None, "No lyrics found", __service__
+                            return None, "No lyrics found", __title__
 
             lyr = song_search.split("<div id='songlyrics_h' class='dn'>")[1].split('<!-- /SONG LYRICS -->')[0]
             lyr = self.clean_br_regex.sub( "\n", lyr ).strip()
@@ -69,7 +67,7 @@ class LyricsFetcher:
             return lyrics, False
         except:
             log( "%s: %s::%s (%d) [%s]" % (
-                   __service__, self.__class__.__name__,
+                   __title__, self.__class__.__name__,
                    sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
                    sys.exc_info()[ 2 ].tb_lineno,
                    sys.exc_info()[ 1 ]

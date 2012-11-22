@@ -12,7 +12,6 @@ from hashlib import md5
 import chardet
 
 __title__ = "MiniLyrics"
-__allow_exceptions__ = False
 
 class LyricsFetcher:
     def __init__( self ):

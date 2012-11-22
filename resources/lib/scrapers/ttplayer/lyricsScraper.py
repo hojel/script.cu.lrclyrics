@@ -12,7 +12,6 @@ import random
 import codecs
 
 __title__ = "ttplayer.com"
-__allow_exceptions__ = False
 
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)",
                     "\([^\)]*mix\)", "\([^\)]*version\)",
