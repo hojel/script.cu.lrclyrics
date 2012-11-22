@@ -66,7 +66,7 @@ class LyricsFetcher:
                 if line.find("Lyrics from:") < 0:
                     lir.append(line)
             lyrics = u"\n".join( lir )
-            return lyrics
+            return lyrics, False
         except:
             log( "%s: %s::%s (%d) [%s]" % (
                    __service__, self.__class__.__name__,
@@ -74,4 +74,4 @@ class LyricsFetcher:
                    sys.exc_info()[ 2 ].tb_lineno,
                    sys.exc_info()[ 1 ]
                    ))
-            return ''
+            return '', False

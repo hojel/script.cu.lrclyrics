@@ -29,11 +29,11 @@ class LyricsFetcher:
         for x in urls:
             links.append( ( x[2] + ' - ' + x[1], x[0], x[2], x[1] ) )
         if len(links) == 0:
-            lyrics = ""
+            lyrics = "", True
             return lyrics
         elif len(links) == 1:
             lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics
+            return lyrics, True
         else:
             return links
 

@@ -138,10 +138,10 @@ class LyricsFetcher:
             links.append( ( x[1] + ' - ' + x[2], x[0], x[1], x[2] ) )
         if len(links) == 0:
             lyrics = ""
-            return lyrics
+            return lyrics, True
         elif len(links) == 1:
             lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics
+            return lyrics, True
         else:
             return links
 

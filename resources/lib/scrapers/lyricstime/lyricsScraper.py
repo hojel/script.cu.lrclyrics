@@ -28,11 +28,11 @@ class LyricsFetcher:
                       lambda m: unichr( int( m.group( 1 ) ) ), lyr.decode("ISO-8859-1") )
             lyr = u"\n".join( [ lyric.strip() for lyric in lyr.splitlines() ] )
             lyrics = self.clean_info_regex.sub( "", lyr )
-            return lyrics
+            return lyrics, False
         except:
             log( "%s: %s::%s (%d) [%s]" % ( __service__, self.__class__.__name__,
                                         sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
                                         sys.exc_info()[ 2 ].tb_lineno,
                                         sys.exc_info()[ 1 ]
                                         ))
-            return ''
+            return '', False

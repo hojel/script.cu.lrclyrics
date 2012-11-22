@@ -40,10 +40,10 @@ class LyricsFetcher:
                 htmlparser = HTMLParser.HTMLParser()
                 lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
                 lyrics = re.sub('<[^<]+?>', '', lyricstext)
-                return lyrics
+                return lyrics, False
             except:
-                return ''
+                return '', False
 #                return None, __language__(30004) % __title__, __service__
         else:
-            return ''
+            return '', False
 #            return None, __language__(30002) % (title, artist), __service__

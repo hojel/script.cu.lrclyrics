@@ -84,7 +84,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         xbmc.sleep( 60 )
         lyrics =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
         if ( lyrics ):
-            self.show_lyrics( lyrics )
+            self.show_lrc_lyrics( lyrics )
             self.getControl( 200 ).setEnabled( False )
             self.getControl( 200 ).setLabel( __language__( 30002 ) )
         else:
@@ -92,22 +92,25 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if ( lyrics == "" ):
                 lyrics = self.get_lyrics_from_file( artist, song )
             if ( lyrics != "" ):
-                self.show_lyrics( lyrics )
+                self.show_lrc_lyrics( lyrics )
                 self.getControl( 200 ).setEnabled( False )
                 self.getControl( 200 ).setLabel( __language__( 30000 ) )
             else:
                 self.getControl( 200 ).setEnabled( True )
                 self.getControl( 200 ).setLabel( self.scraper_title )
-                lyrics = self.LyricsScraper.get_lyrics( artist, song )
-
+                lyrics, lrc = self.LyricsScraper.get_lyrics( artist, song )
+                log('LYRICS: %s' % lyrics)
                 if ( isinstance( lyrics, basestring ) ):
-                    self.show_lyrics( lyrics, True )
+                    if lrc:
+                        self.show_lrc_lyrics( lyrics, True )
+                    else:
+                        self.show_lyrics( lyrics, True )
                 elif ( isinstance( lyrics, list ) and lyrics ):
                     self.show_choices( lyrics )
 
     def get_lyrics_from_list( self, item ):
         lyrics = self.LyricsScraper.get_lyrics_from_list( self.menu_items[ item ] )
-        self.show_lyrics( lyrics, True )
+        self.show_lrc_lyrics( lyrics, True )
 
     def get_lyrics_from_file( self, artist, song ):
         if ( self.settings[ "artist_folder" ] ):
@@ -139,7 +142,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             log( "%s::%s (%d) [%s]" % (self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ]) )
             return False
 
-    def show_lyrics( self, lyrics, save=False ):
+    def show_lrc_lyrics( self, lyrics, save=False ):
         if ( lyrics == "" ):
             self.getControl( 100 ).setText( __language__( 30001 ) )
             self.getControl( 110 ).addItem( __language__( 30001 ) )
@@ -157,6 +160,21 @@ class GUI( xbmcgui.WindowXMLDialog ):
         if (self.allowtimer and self.settings[ "smooth_scrolling" ] and self.getControl( 110 ).size() > 1):
             self.refresh()
 
+    def show_lyrics(self, lyrics, save=False):
+        if ( lyrics == "" ):
+            self.getControl( 110 ).addItem( __language__( 30001 ) )
+        else:
+            if (lyrics == "{{Instrumental}}"):
+                lyrics = "Instrumental"
+            if ( self.settings[ "save_lyrics" ] and save ):
+                success = self.save_lyrics_to_file( lyrics )
+            splitLyrics = lyrics.splitlines()
+            for x in splitLyrics:
+                self.getControl( 110 ).addItem( x )
+            self.getControl( 110 ).selectItem( 0 )
+            self.show_control( 110 )
+
+            
     def parser_lyrics( self, lyrics):
         self.pOverlay = []
         tag = re.compile('\[(\d+):(\d\d)(\.\d+|)\]')
