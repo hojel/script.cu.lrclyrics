@@ -99,7 +99,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.getControl( 200 ).setEnabled( True )
                 self.getControl( 200 ).setLabel( self.scraper_title )
                 lyrics, lrc = self.LyricsScraper.get_lyrics( artist, song )
-                log('LYRICS: %s' % lyrics)
                 if ( isinstance( lyrics, basestring ) ):
                     if lrc:
                         self.show_lrc_lyrics( lyrics, True )
@@ -171,8 +170,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             splitLyrics = lyrics.splitlines()
             for x in splitLyrics:
                 self.getControl( 110 ).addItem( x )
-            self.getControl( 110 ).selectItem( 0 )
-            self.show_control( 110 )
+        self.getControl( 110 ).selectItem( 0 )
+        self.show_control( 110 )
 
             
     def parser_lyrics( self, lyrics):

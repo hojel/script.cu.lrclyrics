@@ -58,6 +58,7 @@ class LyricsFetcher:
         return ret
 
     def get_lyrics(self, artist, song):
+        log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
         xml ="<?xml version=\"1.0\" encoding='utf-8'?>\r\n"
         xml+="<search filetype=\"lyrics\" artist=\"%s\" title=\"%s\" " % (artist, song)
         xml+="ClientCharEncoding=\"utf-8\"/>\r\n"

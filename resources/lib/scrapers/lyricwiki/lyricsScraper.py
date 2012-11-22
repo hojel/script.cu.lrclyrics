@@ -17,7 +17,6 @@ class LyricsFetcher:
 
     def get_lyrics(self, artist, song):
         log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
-        log( "%s: search api url: %s" % (__title__, self.url))
         req = urllib2.urlopen(self.url % (urllib2.quote(artist), urllib2.quote(song)))
         response = req.read()
         req.close()
