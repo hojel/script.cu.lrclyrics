@@ -19,11 +19,7 @@ class LyricsFetcher:
     def get_lyrics(self, artist, song):
         log( "%s: searching lyrics for %s - %s" % (__service__, artist, song))
         try: # below is borowed from XBMC Lyrics
-            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (
-                        artist.lower()[:1],
-                        artist.lower().replace(" ","_"),
-                        song.lower().replace(" ","_"),
-                        )
+            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace(" ","_"), song.lower().replace(" ","_"))
             lyrics_found = False
             while True:
                 log( "%s: search url: %s" % (__service__, url))

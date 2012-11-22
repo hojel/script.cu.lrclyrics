@@ -18,10 +18,7 @@ class LyricsFetcher:
     def get_lyrics(self, artist, song):
         log( "%s: searching lyrics for %s - %s" % (__service__, artist, song))
         try: # ***** parser - changing this changes search string
-            url = "http://www.lyricstime.com/%s-%s-lyrics.html" % (
-                     replace(artist.lower().replace(" ","-").replace("---","-").replace("--","-")),
-                     replace(song.lower().replace(" ","-").replace("---","-").replace("--","-"))
-                     )
+            url = "http://www.lyricstime.com/%s-%s-lyrics.html" % (replace(artist.lower().replace(" ","-").replace("---","-").replace("--","-")),replace(song.lower().replace(" ","-").replace("---","-").replace("--","-")))
             song_search = urllib.urlopen(url).read()
             log( "%s: search url: %s" % (__service__, url))
             lyr = song_search.split('<div id="songlyrics" >')[1].split('</div>')[0]

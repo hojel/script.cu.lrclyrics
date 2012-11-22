@@ -151,7 +151,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 lyrics1 += line + '\n'
             self.getControl( 110 ).selectItem( 0 )
             self.getControl( 100 ).setText( lyrics1 )
-            if ( self.settings[ "save_lyrics" ] and save ): success = self.save_lyrics_to_file( lyrics )
+            if ( self.settings[ "save_lyrics" ] and save ):
+                success = self.save_lyrics_to_file( lyrics )
         self.show_control( 100 + ( self.settings[ "smooth_scrolling" ] * 10 ) )
         if (self.allowtimer and self.settings[ "smooth_scrolling" ] and self.getControl( 110 ).size() > 1):
             self.refresh()
@@ -237,7 +238,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def myPlayerChanged( self, event, force_update=False ):
         #log( "GUI::myPlayerChanged [%s]" % ([ "stopped","ended","started" ][ event ]) )
-        if ( event < 2 ): 
+        if ( event < 2 ):
             self.exit_script()
         else:
             for cnt in range( 5 ):
@@ -287,11 +288,11 @@ class MyPlayer( xbmc.Player ):
         xbmc.sleep( 300 )
         if ( not xbmc.Player().isPlayingAudio() ):
             self.function( 0 )
-    
+
     def onPlayBackEnded( self ):
         xbmc.sleep( 300 )
         if ( not xbmc.Player().isPlayingAudio() ):
             self.function( 1 )
-    
+
     def onPlayBackStarted( self ):
         self.function( 2 )

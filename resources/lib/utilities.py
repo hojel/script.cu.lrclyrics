@@ -4,8 +4,6 @@ import re
 import chardet
 import xbmc, xbmcgui, xbmcvfs
 
-DEBUG_MODE = 4
-
 __addon__     = sys.modules[ "__main__" ].__addon__
 __addonname__ = sys.modules[ "__main__" ].__addonname__
 __cwd__       = sys.modules[ "__main__" ].__cwd__
