@@ -16,15 +16,13 @@ class LyricsFetcher:
         self.search_results_regex = re.compile("<a href=\"[^\"]+\">([^<]+)</a></td>[^<]+<td><a href=\"([^\"]+)\" class=\"b\">[^<]+</a></td>", re.IGNORECASE)
         self.next_results_regex = re.compile("<A href=\"([^\"]+)\" class=\"pages\">next .</A>", re.IGNORECASE)
 
-    def get_lyrics_thread(self, song):
-        log( "%s: searching lyrics for %s" % (__service__, song))
-        l = Lyrics()
-        l.song = song
+    def get_lyrics(self, artist, song):
+        log( "%s: searching lyrics for %s - %s" % (__service__, artist, song))
         try: # below is borowed from XBMC Lyrics
             url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (
-                        song.artist.lower()[:1],
-                        song.artist.lower().replace(" ","_"),
-                        song.title.lower().replace(" ","_"),
+                        artist.lower()[:1],
+                        artist.lower().replace(" ","_"),
+                        song.lower().replace(" ","_"),
                         )
             lyrics_found = False
             while True:
@@ -40,7 +38,7 @@ class LyricsFetcher:
 
                 # Let's try to use the research box if we didn't yet
                 if not 'search' in url:
-                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + urllib.quote_plus(song.title.lower())
+                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + urllib.quote_plus(song.lower())
                 else:
                     # the search gave more than on result, let's try to find our song
                     url = ""
@@ -49,7 +47,7 @@ class LyricsFetcher:
                     results = self.search_results_regex.findall(song_search, start, end)
 
                     for result in results:
-                        if result[0].lower() in song.artist.lower():
+                        if result[0].lower() in artist.lower():
                             url = "http://www.lyricsmode.com" + result[1]
                             lyrics_found = True
                             break
@@ -71,10 +69,8 @@ class LyricsFetcher:
                 line.strip()
                 if line.find("Lyrics from:") < 0:
                     lir.append(line)
-            lyr = u"\n".join( lir )
-            l.lyrics = lyr
-            l.source = __title__
-            return l, None, __service__
+            lyrics = u"\n".join( lir )
+            return lyrics
         except:
             log( "%s: %s::%s (%d) [%s]" % (
                    __service__, self.__class__.__name__,
@@ -82,4 +78,4 @@ class LyricsFetcher:
                    sys.exc_info()[ 2 ].tb_lineno,
                    sys.exc_info()[ 1 ]
                    ))
-            return None, __language__(30004) % (__title__), __service__
+            return ''

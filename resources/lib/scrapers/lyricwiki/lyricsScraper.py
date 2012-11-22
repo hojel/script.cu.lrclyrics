@@ -17,19 +17,18 @@ class LyricsFetcher:
     def __init__( self ):
         self.url = 'http://lyrics.wikia.com/api.php?artist=%s&song=%s&fmt=realjson'
 
-    def get_lyrics_thread(self, song):
-        log( "%s: searching lyrics for %s" % (__service__, song))
+    def get_lyrics(self, artist, song):
+        log( "%s: searching lyrics for %s - %s" % (__service__, artist, song))
         log( "%s: search api url: %s" % (__service__, self.url))
-        l = Lyrics()
-        l.song = song
-        req = urllib2.urlopen(self.url % (urllib2.quote(song.artist), urllib2.quote(song.title)))
+        req = urllib2.urlopen(self.url % (urllib2.quote(artist), urllib2.quote(song)))
         response = req.read()
         req.close()
         data = simplejson.loads(response)
         try:
             self.page = data['url']
         except:
-            return None, __language__(30002) % (song.title, song.artist), __service__
+            return ''
+#            return None, __language__(30002) % (song, artist), __service__
         if not self.page.endswith('action=edit'):
             log( "%s: search url: %s" % (__service__, self.page))
             req = urllib2.urlopen(self.page)
@@ -40,10 +39,11 @@ class LyricsFetcher:
                 lyricscode = (matchcode.group(1))
                 htmlparser = HTMLParser.HTMLParser()
                 lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
-                l.lyrics = re.sub('<[^<]+?>', '', lyricstext)
-                l.source = __title__
-                return l, None, __service__
+                lyrics = re.sub('<[^<]+?>', '', lyricstext)
+                return lyrics
             except:
-                return None, __language__(30004) % __title__, __service__
+                return ''
+#                return None, __language__(30004) % __title__, __service__
         else:
-            return None, __language__(30002) % (song.title, song.artist), __service__
+            return ''
+#            return None, __language__(30002) % (title, artist), __service__

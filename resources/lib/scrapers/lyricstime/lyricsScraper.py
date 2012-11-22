@@ -15,14 +15,12 @@ class LyricsFetcher:
         self.clean_br_regex = re.compile( "<br[ /]*>[\s]*", re.IGNORECASE )
         self.clean_info_regex = re.compile( "\[[a-z]+?:.*\]\s" )
 
-    def get_lyrics_thread(self, song):
-        log( "%s: searching lyrics for %s" % (__service__, song))
-        l = Lyrics()
-        l.song = song
+    def get_lyrics(self, artist, song):
+        log( "%s: searching lyrics for %s - %s" % (__service__, artist, song))
         try: # ***** parser - changing this changes search string
             url = "http://www.lyricstime.com/%s-%s-lyrics.html" % (
-                     replace(song.artist.lower().replace(" ","-").replace("---","-").replace("--","-")),
-                     replace(song.title.lower().replace(" ","-").replace("---","-").replace("--","-"))
+                     replace(artist.lower().replace(" ","-").replace("---","-").replace("--","-")),
+                     replace(song.lower().replace(" ","-").replace("---","-").replace("--","-"))
                      )
             song_search = urllib.urlopen(url).read()
             log( "%s: search url: %s" % (__service__, url))
@@ -32,14 +30,12 @@ class LyricsFetcher:
             lyr = self.normalize_lyrics_regex.sub(
                       lambda m: unichr( int( m.group( 1 ) ) ), lyr.decode("ISO-8859-1") )
             lyr = u"\n".join( [ lyric.strip() for lyric in lyr.splitlines() ] )
-            lyr = self.clean_info_regex.sub( "", lyr )
-            l.lyrics = lyr
-            l.source = __title__
-            return l, None, __service__
+            lyrics = self.clean_info_regex.sub( "", lyr )
+            return lyrics
         except:
             log( "%s: %s::%s (%d) [%s]" % ( __service__, self.__class__.__name__,
                                         sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
                                         sys.exc_info()[ 2 ].tb_lineno,
                                         sys.exc_info()[ 1 ]
                                         ))
-            return None, __language__(30004) % (__title__), __service__
+            return ''
