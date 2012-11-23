@@ -7,7 +7,6 @@ from threading import Timer
 from utilities import *
 from embedlrc import *
 
-__addonname__ = sys.modules[ "__main__" ].__addonname__
 __language__  = sys.modules[ "__main__" ].__language__
 
 class GUI( xbmcgui.WindowXMLDialog ):

@@ -8,8 +8,6 @@ taxigps
 import os
 import urllib
 import re
-import random
-import codecs
 
 __title__ = "lyrdb.com"
 
