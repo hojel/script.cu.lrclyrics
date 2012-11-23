@@ -35,6 +35,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.song = None
         self.controlId = -1
         self.pOverlay = []
+        self.extensions = ['.lrc','.txt']
 
     def refresh(self):
         self.lock.acquire()
@@ -79,13 +80,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.reset_controls()
         self.getControl( 200 ).setLabel( "" )
         self.menu_items = []
-
         xbmc.sleep( 60 )
         try:
             lyrics =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
         except:
             lyrics = ''
         if ( lyrics ):
+            log('found embedded lyrics')
             self.show_lrc_lyrics( lyrics )
             self.getControl( 200 ).setEnabled( False )
             self.getControl( 200 ).setLabel( __language__( 30002 ) )
@@ -94,15 +95,20 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if ( lyrics == "" ):
                 lyrics = self.get_lyrics_from_file( artist, song )
             if ( lyrics != "" ):
-                self.show_lrc_lyrics( lyrics )
+                log('found lyrics from file')
+                if self.lrc:
+                    self.show_lrc_lyrics( lyrics )
+                else:
+                    self.show_lyrics( lyrics )
                 self.getControl( 200 ).setEnabled( False )
                 self.getControl( 200 ).setLabel( __language__( 30000 ) )
             else:
                 self.getControl( 200 ).setEnabled( True )
                 self.getControl( 200 ).setLabel( self.scraper_title )
-                lyrics, lrc = self.LyricsScraper.get_lyrics( artist, song )
+                lyrics, self.lrc = self.LyricsScraper.get_lyrics( artist, song )
                 if ( isinstance( lyrics, basestring ) ):
-                    if lrc:
+                    log('found lyrics online')
+                    if self.lrc:
                         self.show_lrc_lyrics( lyrics, True )
                     else:
                         self.show_lyrics( lyrics, True )
@@ -113,12 +119,33 @@ class GUI( xbmcgui.WindowXMLDialog ):
         lyrics = self.LyricsScraper.get_lyrics_from_list( self.menu_items[ item ] )
         self.show_lrc_lyrics( lyrics, True )
 
+    def check_file( self, path ):
+        if xbmcvfs.exists(self.song_path):
+            self.found = True
+            if self.ext == '.lrc':
+                self.lrc = True
+            else:
+                self.lrc = False
+        else:
+            self.found = False
+
     def get_lyrics_from_file( self, artist, song ):
         if ( self.settings[ "artist_folder" ] ):
-            self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + ".lrc" ), "utf-8" )
+            for self.ext in self.extensions:
+                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
+                self.check_file(self.song_path)
+                if self.found:
+                    break
         else:
-            self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + ".lrc" ), "utf-8" )
-        return get_textfile( self.song_path )
+            for self.ext in self.extensions:
+                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
+                self.check_file(self.song_path)
+                if self.found:
+                    break
+        if self.found:
+            return get_textfile( self.song_path )
+        else:
+            return ''
 
     def get_lyrics_from_file2( self ):
         path = xbmc.getInfoLabel('Player.Filenameandpath')
@@ -126,10 +153,21 @@ class GUI( xbmcgui.WindowXMLDialog ):
         basename = os.path.basename(path)
         filename = basename.rsplit( ".", 1 )[ 0 ]
         if ( self.settings[ "subfolder" ] ):
-            self.song_path = unicode( os.path.join( dirname, self.settings[ "subfolder_name" ], filename + ".lrc" ), "utf-8" )
+            for self.ext in self.extensions:
+                self.song_path = unicode( os.path.join( dirname, self.settings[ "subfolder_name" ], filename + self.ext ), "utf-8" )
+                self.check_file(self.song_path)
+                if self.found:
+                    break
         else:
-            self.song_path = unicode( os.path.join( dirname, filename + ".lrc" ), "utf-8" )
-        return get_textfile( self.song_path )
+            for self.ext in self.extensions:
+                self.song_path = unicode( os.path.join( dirname, filename + self.ext ), "utf-8" )
+                self.check_file(self.song_path)
+                if self.found:
+                    break
+        if self.found:
+            return get_textfile( self.song_path )
+        else:
+            return ''
 
     def save_lyrics_to_file( self, lyrics ):
         try:
@@ -145,6 +183,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def show_lrc_lyrics( self, lyrics, save=False ):
         if ( lyrics == "" ):
+            log('no lyrics found')
             self.getControl( 100 ).setText( __language__( 30001 ) )
             self.getControl( 110 ).addItem( __language__( 30001 ) )
         else:
@@ -175,7 +214,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 110 ).selectItem( 0 )
         self.show_control( 110 )
 
-            
     def parser_lyrics( self, lyrics):
         self.pOverlay = []
         tag = re.compile('\[(\d+):(\d\d)(\.\d+|)\]')
@@ -295,8 +333,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.lock.release()
                 self.refresh()
 
-
-## Thanks Thor918 for this class ##
 class MyPlayer( xbmc.Player ):
     """ Player Class: calls function when song changes or playback ends """
     def __init__( self, *args, **kwargs ):

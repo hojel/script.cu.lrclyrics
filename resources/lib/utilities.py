@@ -41,8 +41,6 @@ def get_settings():
 
 def get_textfile(filepath):
     try:
-        if (not xbmcvfs.exists(filepath)):
-            return ""
         file = xbmcvfs.File( filepath )
         data = file.read()
         file.close()
