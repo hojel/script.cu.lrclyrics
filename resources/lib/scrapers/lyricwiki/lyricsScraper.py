@@ -24,7 +24,7 @@ class LyricsFetcher:
         try:
             self.page = data['url']
         except:
-            return ''
+            return '', False
         if not self.page.endswith('action=edit'):
             log( "%s: search url: %s" % (__title__, self.page))
             req = urllib2.urlopen(self.page)
