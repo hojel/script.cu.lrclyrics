@@ -8,7 +8,7 @@ import xbmcaddon
 
 # Script constants 
 __addon__     = xbmcaddon.Addon()
-__addonname__ = __addon__.getAddonInfo('path')
+__addonname__ = __addon__.getAddonInfo('name')
 __cwd__       = __addon__.getAddonInfo('path').decode("utf-8")
 __profile__   = xbmc.translatePath( __addon__.getAddonInfo('profile') ).decode("utf-8")
 __language__  = __addon__.getLocalizedString
