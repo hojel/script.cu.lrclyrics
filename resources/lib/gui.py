@@ -206,7 +206,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 110 ).reset()
         self.getControl( 120 ).reset()
 
-    def exit_script( self, restart=False ):
+    def exit_script( self ):
         self.lock.acquire()
         try:
             self.timer.cancel()
@@ -255,8 +255,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.MyPlayer = MyPlayer( xbmc.PLAYER_CORE_PAPLAYER, function=self.myPlayerChanged )
         self.myPlayerChanged( 2 )
 
-    def myPlayerChanged( self, event, force_update=False ):
-        #log( "GUI::myPlayerChanged [%s]" % ([ "stopped","ended","started" ][ event ]) )
+    def myPlayerChanged( self, event ):
+        log( "myPlayer event: %s" % ([ "stopped","ended","started" ][ event ]) )
         if ( event < 2 ):
             self.exit_script()
         else:
@@ -274,7 +274,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     pass
                 if ( song and ( not artist or self.settings[ "use_filename" ] ) ):
                     artist, song = self.get_artist_from_filename( songfile )
-                if ( song and ( self.song != song or self.artist != artist or force_update ) ):
+                if ( song and ( self.song != song or self.artist != artist ) ):
                     self.artist = artist
                     self.song = song
                     self.lock.acquire()

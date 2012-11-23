@@ -9,6 +9,7 @@ __profile__   = sys.modules[ "__main__" ].__profile__
 
 # base paths
 BASE_DATA_PATH = sys.modules[ "__main__" ].__profile__
+CANCEL_DIALOG  = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
 
 def _create_base_paths():
     """ creates the base folders """
