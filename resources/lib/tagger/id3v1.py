@@ -10,7 +10,6 @@ from tagger.exceptions import *
 from tagger.constants import *
 
 import struct, os
-import xbmcvfs
 
 class ID3v1(object):
     """
@@ -63,11 +62,18 @@ class ID3v1(object):
         @type mode: constant
         """
 
-        if not xbmcvfs.exists(filename):
+        if not os.path.exists(filename):
             raise ID3ParameterException("File not found: %s" % filename)
 
-        self.__f = xbmcvfs.File(filename)
-        self.read_only = True
+        try:
+            self.__f = open(filename, 'rb+')
+            self.read_only = False
+        except IOError, (errno, strerr):
+            if errno == 13: # permission denied
+                self.__f = open(filename, 'rb')
+                self.read_only = True
+            else:
+                raise
         
         self.__filename = filename
         self.__tag = self.default_tags()
@@ -125,8 +131,8 @@ class ID3v1(object):
             self.comment,
             self.genre)
     
-        f = xbmcvfs.File(filename, 'w')
-        self.__f.seek(0, 0)
+        f = open(filename, 'wb+')
+        self.__f.seek(0)
         buf = self.__f.read(4096)
         while buf:
             f.write(buf)
