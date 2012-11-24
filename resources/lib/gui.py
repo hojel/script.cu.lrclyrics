@@ -191,7 +191,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         if ( lyrics == "" ):
             log('no lyrics found')
             self.getControl( 100 ).setText( __language__( 30001 ) )
-            self.getControl( 110 ).addItem( __language__( 30001 ) )
+            self.show_control( 100 )
         else:
             self.parser_lyrics( lyrics )
             lyrics1 = ""
@@ -199,17 +199,17 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.getControl( 110 ).addItem( line )
                 lyrics1 += line + '\n'
             self.getControl( 110 ).selectItem( 0 )
-            self.getControl( 100 ).setText( lyrics1 )
             if ( self.settings[ "save_lyrics" ] and save ):
                 success = self.save_lyrics_to_file( lyrics )
-        self.show_control( 100 + ( self.settings[ "smooth_scrolling" ] * 10 ) )
-        if (self.allowtimer and self.settings[ "smooth_scrolling" ] and self.getControl( 110 ).size() > 1):
-            self.refresh()
+            self.show_control( 110 )
+            if (self.allowtimer and self.getControl( 110 ).size() > 1):
+                self.refresh()
 
     def show_lyrics(self, lyrics, save=False):
         if ( lyrics == "" ):
             log('no lyrics found')
-            self.getControl( 110 ).addItem( __language__( 30001 ) )
+            self.getControl( 100 ).setText( __language__( 30001 ) )
+            self.show_control( 100 )
         else:
             if (lyrics == "{{Instrumental}}"):
                 lyrics = "Instrumental"
@@ -218,8 +218,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             splitLyrics = lyrics.splitlines()
             for x in splitLyrics:
                 self.getControl( 110 ).addItem( x )
-        self.getControl( 110 ).selectItem( 0 )
-        self.show_control( 110 )
+            self.getControl( 110 ).selectItem( 0 )
+            self.show_control( 110 )
 
     def parser_lyrics( self, lyrics):
         self.pOverlay = []
@@ -331,7 +331,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self.get_lyrics( artist, song )
                     break
                 xbmc.sleep( 50 )
-            if (self.allowtimer and self.settings[ "smooth_scrolling" ] and self.getControl( 110 ).size() > 1):
+            if (self.allowtimer and self.getControl( 110 ).size() > 1):
                 self.lock.acquire()
                 try:
                     self.timer.cancel()
