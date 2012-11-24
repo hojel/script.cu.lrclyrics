@@ -90,9 +90,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.show_lyrics( lyrics )
             self.getControl( 200 ).setLabel( __language__( 30002 ) )
         else:
-            lyrics = self.get_lyrics_from_file2()
-            if ( lyrics == "" ):
-                lyrics = self.get_lyrics_from_file( artist, song )
+            lyrics = self.get_lyrics_from_file(artist, song)
             if ( lyrics != "" ):
                 log('found lyrics from file')
                 if self.lrc:
@@ -130,24 +128,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.found = False
 
     def get_lyrics_from_file( self, artist, song ):
-        if ( self.settings[ "artist_folder" ] ):
-            for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
-                self.check_file(self.song_path)
-                if self.found:
-                    break
-        else:
-            for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
-                self.check_file(self.song_path)
-                if self.found:
-                    break
-        if self.found:
-            return get_textfile( self.song_path )
-        else:
-            return ''
-
-    def get_lyrics_from_file2( self ):
         path = xbmc.getInfoLabel('Player.Filenameandpath')
         dirname = os.path.dirname(path)
         basename = os.path.basename(path)
@@ -166,8 +146,23 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     break
         if self.found:
             return get_textfile( self.song_path )
+        if ( self.settings[ "artist_folder" ] ):
+            for self.ext in self.extensions:
+                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
+                self.check_file(self.song_path)
+                if self.found:
+                    break
+        else:
+            for self.ext in self.extensions:
+                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
+                self.check_file(self.song_path)
+                if self.found:
+                    break
+        if self.found:
+            return get_textfile( self.song_path )
         else:
             return ''
+            
 
     def save_lyrics_to_file( self, lyrics ):
         try:
