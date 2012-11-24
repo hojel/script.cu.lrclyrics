@@ -78,7 +78,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def get_lyrics(self, artist, song):
         self.reset_controls()
-        self.getControl( 200 ).setLabel( "" )
         self.menu_items = []
         xbmc.sleep( 60 )
         try:
@@ -250,6 +249,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 100 ).reset()
         self.getControl( 110 ).reset()
         self.getControl( 120 ).reset()
+        self.getControl( 200 ).setLabel('')
 
     def exit_script( self ):
         self.lock.acquire()
