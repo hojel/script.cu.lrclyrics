@@ -6,7 +6,6 @@ import xbmc, xbmcgui, xbmcvfs
 from threading import Timer
 from utilities import *
 from embedlrc import *
-from mutagen.mp3 import MP3
 
 __language__  = sys.modules[ "__main__" ].__language__
 

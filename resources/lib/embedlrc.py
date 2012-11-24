@@ -78,7 +78,7 @@ See: http://id3.org/id3v2.3.0
 """
 def getID3Lyrics(filename):
     id3 = ID3v2(filename)
-    if id3.version == '2.2':
+    if id3.version == 2.2:
         sylt="SLT"
         uslt="ULT"
     else:
