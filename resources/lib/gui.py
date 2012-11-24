@@ -6,6 +6,7 @@ import xbmc, xbmcgui, xbmcvfs
 from threading import Timer
 from utilities import *
 from embedlrc import *
+from mutagen.mp3 import MP3
 
 __language__  = sys.modules[ "__main__" ].__language__
 
@@ -82,12 +83,15 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.menu_items = []
         xbmc.sleep( 60 )
         try:
-            lyrics =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
+            lyrics, self.lrc =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
         except:
             lyrics = ''
         if ( lyrics ):
             log('found embedded lyrics')
-            self.show_lrc_lyrics( lyrics )
+            if self.lrc:
+                self.show_lrc_lyrics( lyrics )
+            else:
+                self.show_lyrics( lyrics )
             self.getControl( 200 ).setEnabled( False )
             self.getControl( 200 ).setLabel( __language__( 30002 ) )
         else:
@@ -107,7 +111,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.getControl( 200 ).setLabel( self.scraper_title )
                 lyrics, self.lrc = self.LyricsScraper.get_lyrics( artist, song )
                 if ( isinstance( lyrics, basestring ) ):
-                    log('found lyrics online')
+                    if ( lyrics != "" ):
+                        log('found lyrics online')
                     if self.lrc:
                         self.show_lrc_lyrics( lyrics, True )
                     else:
@@ -117,6 +122,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def get_lyrics_from_list( self, item ):
         lyrics = self.LyricsScraper.get_lyrics_from_list( self.menu_items[ item ] )
+        if ( lyrics != "" ):
+            log('found lyrics online')
         self.show_lrc_lyrics( lyrics, True )
 
     def check_file( self, path ):
@@ -202,6 +209,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def show_lyrics(self, lyrics, save=False):
         if ( lyrics == "" ):
+            log('no lyrics found')
             self.getControl( 110 ).addItem( __language__( 30001 ) )
         else:
             if (lyrics == "{{Instrumental}}"):

@@ -1,19 +1,21 @@
 import os
+import re
 import chardet
 from tagger import *
 import xbmcvfs
+from mutagen.mp3 import MP3
 
 def getEmbedLyrics(filename):
-    lyrics = getLyrics3(filename)
+    lyrics, lrc = getLyrics3(filename)
     if (not lyrics):
-        lyrics = getID3Lyrics(filename)
+        lyrics, lrc = getID3Lyrics(filename)
     if (lyrics):
         enc = chardet.detect(lyrics)
         if (enc['encoding'] == 'utf-8'):
-            return lyrics
+            return lyrics, lrc
         else:
-            return unicode( lyrics, enc['encoding'] ).encode( "utf-8")
-    return None
+            return unicode( lyrics, enc['encoding'] ).encode( "utf-8"), lrc
+    return None, lrc
 
 """
 Get LRC lyrics embed with Lyrics3/Lyrics3V2 format
@@ -33,7 +35,7 @@ def getLyrics3(filename):
         buf = f.read(5100+11)
         f.close();
         start = buf.find("LYRICSBEGIN")
-        return buf[start+11:]
+        return buf[start+11:], True
     elif (buf == "LYRICS200"):
         """ Find Lyrics3v2 """
         f.seek(-9-6, os.SEEK_CUR)
@@ -48,10 +50,10 @@ def getLyrics3(filename):
                 length = int(buf[3:8])
                 content = buf[8:8+length]
                 if (tag == 'LYR'):
-                    return content
+                    return content, True
                 buf = buf[8+length:]
     f.close();
-    return None
+    return None, True
 
 def endOfString(string, utf16=False):
     if (utf16):
@@ -71,15 +73,17 @@ def ms2timestamp(ms):
     return timestamp
 
 """
-Get SYLT/TXXX lyrics embed with ID3v2 format
+Get USLT/SYLT/TXXX lyrics embed with ID3v2 format
 See: http://id3.org/id3v2.3.0
 """
 def getID3Lyrics(filename):
     id3 = ID3v2(filename)
-    if id3.version == 2.2:
+    if id3.version == '2.2':
         sylt="SLT"
+        uslt="ULT"
     else:
         sylt="SYLT"
+        uslt="USLT"
     for tag in id3.frames:
         if tag.fid == sylt:
             enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
@@ -108,7 +112,7 @@ def getID3Lyrics(filename):
                     timems += (256)**(3-x) * ord(time[x])
                 lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
                 content=content[pos+5:]
-            return lyrics.encode( "utf-8")
+            return lyrics.encode( "utf-8"), True
         elif tag.fid == "TXXX":
             enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
             raw = tag.rawdata[1:]
@@ -121,5 +125,11 @@ def getID3Lyrics(filename):
                 lyrics = raw[pos+1:]
                 if (enc == 'latin_1'):
                     enc = chardet.detect(lyrics)['encoding']
-                return lyrics.decode(enc).encode( "utf-8")
-    return None
+                return lyrics.decode(enc).encode( "utf-8"), True
+        elif tag.fid == uslt:
+            id3 = MP3(filename)
+            for key in id3.keys():           # all keys in the file
+                if re.search("USLT:", key):  # find USLT key
+                    lyrics = id3[key].text   # unicode
+                    return lyrics.encode("utf-8"), False
+    return None, True
