@@ -13,6 +13,7 @@ from tagger.utility import *
 from tagger.debug import *
 
 import os, struct, sys, types, tempfile, math
+import xbmcvfs
 
 class ID3v2:
     """
@@ -43,7 +44,7 @@ class ID3v2:
 
     """
     f = None
-    supported = ('2.2', '2.3', '2.4')
+    supported = [2.2, 2.3, 2.4]
     
     # ---------------------------------------------------------
     def __init__(self, filename, version=ID3V2_DEFAULT_VERSION):
@@ -59,19 +60,14 @@ class ID3v2:
         to be in read or modify mode.
         """
 
-        if str(version) not in self.supported:
+        if version not in self.supported:
             raise ID3ParameterException("version %s not valid" % str(version))
 
-        if not os.path.exists(filename):
+        if not xbmcvfs.exists(filename):
             raise ID3ParameterException("filename %s not valid" % filename)
         
-        try:
-          self.f = open(filename, 'rb+')
-          self.read_only = False
-        except IOError, (errno, strerror):
-            if errno == 13: # permission denied
-                self.f = open(filename, 'rb')
-                self.read_only = True
+        self.f = xbmcvfs.File(filename)
+        self.read_only = True
 
         self.filename = filename
 
@@ -79,7 +75,7 @@ class ID3v2:
             self.parse_header()
             self.parse_frames()
         else:
-            self.new_header(str(version))
+            self.new_header(version)
             
     def __del__(self):
         if self.f:
@@ -94,7 +90,7 @@ class ID3v2:
         if not self.tag_exists():
             return 0
         else:
-            if str(self.version) in ('2.2', '2.3', '2.4'):
+            if self.version > 2.2:
                 if self.tag["footer"]:
                     return ID3V2_FILE_HEADER_LENGTH + \
                            ID3V2_FILE_FOOTER_LENGTH + \
@@ -103,7 +99,7 @@ class ID3v2:
     
     # ---------------------------------------------------------
     def tag_exists(self):
-        self.f.seek(0)
+        self.f.seek(0, 0)
         if self.f.read(3) == 'ID3':
             return True
         return False
@@ -115,12 +111,12 @@ class ID3v2:
 
         @todo: dump footer and extension header as well
         """
-        old_pos = self.f.tell()
+        #old_pos = self.f.tell()
         output = ''
         if self.tag["size"]:
-            self.f.seek(0)
+            self.f.seek(0, 0)
             output = self.f.read(ID3V2_FILE_HEADER_LENGTH + self.tag["size"])
-            self.f.seek(old_pos)
+            #self.f.seek(old_pos, 0)
             
         return output
 
@@ -133,18 +129,18 @@ class ID3v2:
         @param fid: frame id
         @param frame: bytes in the frame
         """
-        if self.version == '2.2':
+        if self.version == 2.2:
             return ID3v2_2_Frame(frame=frame, fid=fid)
-        elif self.version == '2.3':
+        elif self.version == 2.3:
             return ID3v2_3_Frame(frame=frame, fid=fid)
-        elif self.version == '2.4':
+        elif self.version == 2.4:
             return ID3v2_4_Frame(frame=frame, fid=fid)
         else:
-            raise ID3NotImplemented("version %s not supported." % self.version)
+            raise ID3NotImplemented("version %f not supported." % self.version)
 
     # ---------------------------------------------------------
     def set_version(self, version):
-        self.version = str(version)
+        self.version = version
 
     # ---------------------------------------------------------
     def _read_null_bytes(self):
@@ -173,17 +169,17 @@ class ID3v2:
             raise ID3ParameterException("version %s not supported" % str(version))
         
         self.tag = {}
-        if str(version) in self.supported:
-            self.version = str(version)
+        if version in self.supported:
+            self.version = version
         else:
             raise ID3NotImplementedException("Version %s not supported", \
                                              str(version))
 
-        if self.version in ('2.4', '2.3'):
+        if version in [2.4, 2.3]:
             self.tag["ext"] = 0
             self.tag["exp"] = 0
             self.tag["footer"] = 0
-        elif self.version == '2.2':
+        elif version == 2.2:
             self.tag["compression"] = 0
             
         self.tag["unsync"] = 0
@@ -196,7 +192,7 @@ class ID3v2:
         Parse Header of the file
 
         """
-        self.f.seek(0)
+        self.f.seek(0, 0)
         data = self.f.read(ID3V2_FILE_HEADER_LENGTH)
         if len(data) != ID3V2_FILE_HEADER_LENGTH:
             raise ID3HeaderInvalidException("ID3 tag header is incomplete")
@@ -210,17 +206,17 @@ class ID3v2:
 
         self.tag["size"] = unsyncsafe(rawsize)
         # NOTE: size  = excluding header + footer
-        version = '2.%d' % (ver >> 8)
+        version = 2 + (ver / 0x100) * 0.1
         if version not in self.supported:
             raise ID3NotImplementedException("version %s not supported" % \
-                                             version)
+                                             str(version))
         else:
             self.version = version
             
-        if self.version in ('2.4', '2.3'):
+        if self.version in [2.4, 2.3]:
             for flagname, bit in ID3V2_3_TAG_HEADER_FLAGS:
                 self.tag[flagname] = (flags >> bit) & 0x01
-        elif self.version == '2.2':
+        elif self.version in [2.2]:
             for flagname, bit in ID3V2_2_TAG_HEADER_FLAGS:
                 self.tag[flagname] = (flags >> bit) & 0x01
 
@@ -234,7 +230,7 @@ class ID3v2:
         """ Parse Extension Header """
 
         # seek to the extension header position
-        self.f.seek(ID3V2_FILE_HEADER_LENGTH)
+        self.f.seek(ID3V2_FILE_HEADER_LENGTH, 0)
         data = self.f.read(ID3V2_FILE_EXTHEADER_LENGTH)
         extsize, flagbytes = struct.unpack("!4sB", data)
         extsize = unsyncsafe(extsize)
@@ -277,11 +273,11 @@ class ID3v2:
             if framedata:
                 try:
                     read += len(framedata)
-                    if self.version == '2.2':
+                    if self.version == 2.2:
                         frame = ID3v2_2_Frame(frame=framedata)
-                    elif self.version == '2.3':
+                    elif self.version == 2.3:
                         frame = ID3v2_3_Frame(frame=framedata)
-                    elif self.version == '2.4':
+                    elif self.version == 2.4:
                         frame = ID3v2_4_Frame(frame=framedata)
                     readframes += 1
                     self.frames.append(frame)
@@ -310,10 +306,8 @@ class ID3v2:
         if c == '\x00':
             return '' # check for NULL frames
         
-        hdr = self.f.read(ID3V2_HEADER_LEN[self.version])
-        size = ID3V2_DATA_LEN[self.version](hdr)
-        if size > self.tag["size"]:
-            return '' # # we should actually just abort here...
+        hdr = self.f.read(id3v2_header_len[self.version])
+        size = id3v2_data_len[self.version](hdr)
         data = self.f.read(size)
         return hdr + data
 
@@ -326,9 +320,9 @@ class ID3v2:
                       size of the tag minus the header and footer
         @type size: int
         """
-        if self.version in ('2.3', '2.4'):
+        if self.version in [2.3, 2.4]:
             flags = ID3V2_3_TAG_HEADER_FLAGS
-        elif self.version == '2.2':
+        elif self.version in [2.2]:
             flags = ID3V2_2_TAG_HEADER_FLAGS
 
         bytestring = 'ID3'
@@ -336,7 +330,7 @@ class ID3v2:
         for flagname, bit in flags:
             flagbyte = flagbyte | ((self.tag[flagname] & 0x01) << bit)
             
-        bytestring += struct.pack('<H', int(self.version[-1]))
+        bytestring += struct.pack('<H', int((self.version * 10) % 10))
         bytestring += struct.pack('!B', flagbyte)
         bytestring += syncsafe(size, 4)
         return bytestring
@@ -358,13 +352,13 @@ class ID3v2:
         
     # ---------------------------------------------------------     
     def commit_to_file(self, filename):
-        newf = open(filename, 'wb+')
+        newf = xbmcvfs.File(filename, 'w')
         framesstring = ''.join(map(lambda x: x.output(), self.frames))
         footerstring = ''
         extstring = ''
         
         # backup existing mp3 data 
-        self.f.seek(self.mp3_data_offset())
+        self.f.seek(self.mp3_data_offset(), 0)
         t = tempfile.TemporaryFile()
         buf = self.f.read(1024)
         while buf:
@@ -380,7 +374,7 @@ class ID3v2:
         newf.write(framesstring)
         newf.write('\x00' * ID3V2_FILE_DEFAULT_PADDING)
         newf.write(footerstring)
-        t.seek(0)
+        t.seek(0, 0)
         buf = t.read(1024)
         while buf:
             newf.write(buf)
@@ -421,7 +415,7 @@ class ID3v2:
                                                   ID3V2_FILE_DEFAULT_PADDING)
             
             # backup existing mp3 data 
-            self.f.seek(self.mp3_data_offset())
+            self.f.seek(self.mp3_data_offset(), 0)
             t = tempfile.TemporaryFile()
             buf = self.f.read(1024)
             while buf:
@@ -431,7 +425,7 @@ class ID3v2:
             # write to a new file
             if not pretend:
                 self.f.close()
-                self.f = open(self.filename, 'wb+')
+                self.f = xbmcvfs.File(self.filename, 'w')
                 self.f.write(headerstring)
                 self.f.write(extstring)
                 self.f.write(framesstring)
@@ -439,7 +433,7 @@ class ID3v2:
                 self.f.write(footerstring)
                 
                 # write mp3 data to new file
-                t.seek(0)
+                t.seek(0, 0)
                 buf = t.read(1024)
                 while buf:
                     self.f.write(buf)
@@ -454,7 +448,7 @@ class ID3v2:
         else:
             headerstring = self.construct_header(self.tag["size"])
             if not pretend:
-                self.f.seek(0)
+                self.f.seek(0, 0)
                 self.f.write(headerstring)
                 self.f.write(extstring)
                 self.f.write(framesstring)
