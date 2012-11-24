@@ -68,11 +68,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 100 ).setVisible( controlId == 100 )
         self.getControl( 110 ).setVisible( controlId == 110 )
         self.getControl( 120 ).setVisible( controlId == 120 )
-        page_control = ( controlId == 100 )
-
         xbmc.sleep( 5 )
         try:
-            self.setFocus( self.getControl( controlId + page_control ) )
+            self.setFocus( self.getControl( controlId + 1 ) )
         except:
             self.setFocus( self.getControl( controlId ) )
 
@@ -90,7 +88,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.show_lrc_lyrics( lyrics )
             else:
                 self.show_lyrics( lyrics )
-            self.getControl( 200 ).setEnabled( False )
             self.getControl( 200 ).setLabel( __language__( 30002 ) )
         else:
             lyrics = self.get_lyrics_from_file2()
@@ -102,10 +99,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self.show_lrc_lyrics( lyrics )
                 else:
                     self.show_lyrics( lyrics )
-                self.getControl( 200 ).setEnabled( False )
                 self.getControl( 200 ).setLabel( __language__( 30000 ) )
             else:
-                self.getControl( 200 ).setEnabled( True )
                 self.getControl( 200 ).setLabel( self.scraper_title )
                 lyrics, self.lrc = self.LyricsScraper.get_lyrics( artist, song )
                 if ( isinstance( lyrics, basestring ) ):
