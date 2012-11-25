@@ -86,7 +86,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def find_lyrics(self, artist, song):
         self.reset_controls()
-        self.menu_items = []
+        self.menu_items = None
         self.source = ''
         xbmc.sleep( 60 )
         # search embedded lrc lyrics
@@ -150,6 +150,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
     def get_lyrics_from_list( self, item ):
         lyrics = self.scraper[1].get_lyrics_from_list( self.menu_items[ item ] )
         log('found lrc lyrics online')
+        self.getControl( 110 ).reset()        
         self.show_lrc_lyrics( lyrics, True )
 
     def get_lyrics_from_file( self, artist, song, getlrc ):
@@ -243,7 +244,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 120 ).selectItem( 0 )
         self.menu_items = choices
         self.show_control( 120 )
-    
+
+    def reshow_choices( self ):
+        if self.menu_items:
+            self.lock.acquire()
+            try:
+                self.timer.cancel()
+            except:
+                pass
+            self.lock.release()
+            self.show_control( 120 )
+            
+        
     def reset_controls( self ):
         self.getControl( 100 ).reset()
         self.getControl( 110 ).reset()
@@ -271,6 +283,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
         actionId = action.getId()
         if ( actionId in CANCEL_DIALOG ):
             self.exit_script()
+        elif ( actionId == 101 ): # ACTION_MOUSE_RIGHT_CLICK
+            self.reshow_choices()
 
     def get_artist_from_filename( self, filename ):
         try:
