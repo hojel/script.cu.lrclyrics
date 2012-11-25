@@ -100,7 +100,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 return
         # search lrc lyrics in file
         if ( self.settings[ "search_file" ] ):
-            lyrics = self.get_lyrics_from_file(artist, song)
+            lyrics = self.get_lyrics_from_file(artist, song, True)
             if ( lyrics ):
                 log('found lrc lyrics from file')
                 source = __language__( 30000 )
