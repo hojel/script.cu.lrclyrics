@@ -13,7 +13,7 @@ def getEmbedLyrics(filename):
         enc = chardet.detect(lyrics)
         return lyrics.decode(enc['encoding']), lrc
     else:        
-        return = getID3Lyrics(filename)
+        return getID3Lyrics(filename)
 
 """
 Get LRC lyrics embed with Lyrics3/Lyrics3V2 format
