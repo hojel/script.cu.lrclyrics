@@ -182,7 +182,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if ( not xbmcvfs.exists( os.path.dirname( self.song_path ) ) ):
                 xbmcvfs.mkdirs( os.path.dirname( self.song_path ) )
             lyrics_file = xbmcvfs.File( self.song_path, "w" )
-            lyrics_file.write( lyrics.encode('utf-8') )
+            if not isinstance (lyrics,str):
+                lyrics = lyrics.encode('utf-8')
+            lyrics_file.write( lyrics )
             lyrics_file.close()
             return True
         except:
