@@ -110,10 +110,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
         for self.scraper in self.scrapers:
             if self.scraper[3]:
                 lyrics = self.scraper[1].get_lyrics( artist, song )
-                self.source = self.scraper[2]
                 if ( lyrics ):
+                    log('found lrc lyrics online')
+                    self.source = self.scraper[2]
                     if ( isinstance( lyrics, basestring ) ):
-                        log('found lrc lyrics online')
                         self.show_lrc_lyrics( lyrics, True )
                     elif ( isinstance( lyrics, list ) and lyrics ):
                         self.show_choices( lyrics )
@@ -140,9 +140,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
         for self.scraper in self.scrapers:
             if not self.scraper[3]:
                 lyrics = self.scraper[1].get_lyrics( artist, song )
-                self.source = self.scraper[2]
                 if ( lyrics ):
                     log('found txt lyrics online')
+                    self.source = self.scraper[2]
                     self.show_lyrics( lyrics, True )
                     return
         log('no lyrics found')
@@ -151,7 +151,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def get_lyrics_from_list( self, item ):
         lyrics = self.scraper[1].get_lyrics_from_list( self.menu_items[ item ] )
-        log('found lrc lyrics online')
         self.getControl( 110 ).reset()        
         self.show_lrc_lyrics( lyrics, True )
 
