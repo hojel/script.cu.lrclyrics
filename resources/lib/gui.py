@@ -181,6 +181,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
         try:
             if ( not xbmcvfs.exists( os.path.dirname( self.song_path ) ) ):
                 xbmcvfs.mkdirs( os.path.dirname( self.song_path ) )
+            base_file = os.path.splitext( self.song_path )[0]
+            if self.lrc:
+                self.song_path = base_file + '.lrc'
+            else:
+                self.song_path = base_file + '.txt'
             lyrics_file = xbmcvfs.File( self.song_path, "w" )
             if not isinstance (lyrics,str):
                 lyrics = lyrics.encode('utf-8')
