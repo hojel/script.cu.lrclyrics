@@ -25,6 +25,8 @@ def log(txt):
 
 def get_settings():
     settings = {}
+    settings[ "search_embedded" ] = __addon__.getSetting( "search_embedded" ) == "true"
+    settings[ "search_file" ] = __addon__.getSetting( "search_file" ) == "true"
     settings[ "save_lyrics" ] = __addon__.getSetting( "save_lyrics" ) == "true"
     settings[ "save_lyrics_path" ] = __addon__.getSetting( "save_lyrics_path" )
     if ( settings[ "save_lyrics_path" ] == "" ):

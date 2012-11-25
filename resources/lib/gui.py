@@ -85,46 +85,47 @@ class GUI( xbmcgui.WindowXMLDialog ):
             except:
                 pass
 
-    def get_lyrics(self, artist, song):
+    def find_lyrics(self, artist, song):
         self.reset_controls()
         self.menu_items = []
         xbmc.sleep( 60 )
-        lyrics, self.lrc =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
-        if ( lyrics ):
-            log('found embedded lyrics')
-            label = __language__( 30002 )
-            if self.lrc:
-                self.show_lrc_lyrics( lyrics, label )
-            else:
-                self.show_lyrics( lyrics, label )
-        else:
+        if ( self.settings[ "search_embedded" ] ):
+            lyrics, self.lrc = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
+            if ( lyrics ):
+                log('found embedded lyrics')
+                label = __language__( 30002 )
+                if self.lrc:
+                    self.show_lrc_lyrics( lyrics, label )
+                else:
+                    self.show_lyrics( lyrics, label )
+                return
+        if ( self.settings[ "search_file" ] ):
             lyrics = self.get_lyrics_from_file(artist, song)
-            if lyrics is not None:
+            if ( lyrics ):
                 log('found lyrics from file')
                 label = __language__( 30000 )
                 if self.lrc:
                     self.show_lrc_lyrics( lyrics, label )
                 else:
                     self.show_lyrics( lyrics, label )
-            else:
-                for scraper in self.scrapers:
-                    lyrics, self.lrc = scraper[1].get_lyrics( artist, song )
-                    self.title = scraper[2]
-                    if lyrics is not None:
-                        if ( isinstance( lyrics, basestring ) ):
-                            log('found lyrics online')
-                            label = self.title
-                            if self.lrc:
-                                self.show_lrc_lyrics( lyrics, label, True )
-                            else:
-                                self.show_lyrics( lyrics, label, True )
-                        elif ( isinstance( lyrics, list ) and lyrics ):
-                            self.show_choices( lyrics )
-                        break
-                if lyrics is None:
-                    log('no lyrics found')
-                    self.getControl( 100 ).setText( __language__( 30001 ) )
-                    self.show_control( 100 )
+                return
+        for scraper in self.scrapers:
+            lyrics, self.lrc = scraper[1].get_lyrics( artist, song )
+            self.title = scraper[2]
+            if ( lyrics ):
+                if ( isinstance( lyrics, basestring ) ):
+                    log('found lyrics online')
+                    label = self.title
+                    if self.lrc:
+                        self.show_lrc_lyrics( lyrics, label, True )
+                    else:
+                        self.show_lyrics( lyrics, label, True )
+                elif ( isinstance( lyrics, list ) and lyrics ):
+                    self.show_choices( lyrics )
+                return
+        log('no lyrics found')
+        self.getControl( 100 ).setText( __language__( 30001 ) )
+        self.show_control( 100 )
 
     def get_lyrics_from_list( self, item ):
         lyrics = self.LyricsScraper.get_lyrics_from_list( self.menu_items[ item ] )
@@ -327,7 +328,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     except:
                         pass
                     self.lock.release()
-                    self.get_lyrics( artist, song )
+                    self.find_lyrics( artist, song )
                     break
                 xbmc.sleep( 50 )
             if (self.allowtimer and self.getControl( 110 ).size() > 1):
