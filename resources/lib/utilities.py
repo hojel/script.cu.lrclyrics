@@ -30,7 +30,7 @@ def get_settings():
     settings[ "save_lyrics" ] = __addon__.getSetting( "save_lyrics" ) == "true"
     settings[ "save_lyrics_path" ] = __addon__.getSetting( "save_lyrics_path" )
     if ( settings[ "save_lyrics_path" ] == "" ):
-        settings[ "save_lyrics_path" ] = os.path.join( BASE_DATA_PATH, "lyrics" )
+        settings[ "save_lyrics_path" ] = os.path.join( BASE_DATA_PATH.encode("utf-8"), "lyrics" )
         __addon__.setSetting(id="save_lyrics_path", value=settings[ "save_lyrics_path" ])
     settings[ "save_artist_folder" ] = __addon__.getSetting( "save_artist_folder" ) == "true"
     settings[ "read_filename" ] = __addon__.getSetting( "read_filename" ) == "true"
