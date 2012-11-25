@@ -13,7 +13,7 @@ def getEmbedLyrics(filename, getlrc):
             pass
     if lyrics:
         enc = chardet.detect(lyrics)
-        return lyrics.decode(enc['encoding']), True
+        return lyrics.decode(enc['encoding'])
     else:        
         return getID3Lyrics(filename, getlrc)
 
@@ -115,7 +115,7 @@ def getID3Lyrics(filename, getlrc):
                         timems += (256)**(3-x) * ord(time[x])
                     lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
                     content = content[pos+5:]
-                return lyrics, True
+                return lyrics
             elif tag.fid == txxx:
                 """
                 Frame data in rawdata[]:
@@ -134,7 +134,7 @@ def getID3Lyrics(filename, getlrc):
                     lyrics = raw[pos+1:]
                     if (enc == 'latin_1'):
                         enc = chardet.detect(lyrics)['encoding']
-                    return lyrics.decode(enc), True
+                    return lyrics.decode(enc)
         elif tag.fid == uslt:
             """
             Frame data in rawdata[]:
@@ -154,5 +154,5 @@ def getID3Lyrics(filename, getlrc):
             lyrics = raw[pos+1:]
             if (enc == 'latin_1'):
                 enc = chardet.detect(lyrics)['encoding']
-            return lyrics.decode(enc), False
-    return None, True
+            return lyrics.decode(enc)
+    return None

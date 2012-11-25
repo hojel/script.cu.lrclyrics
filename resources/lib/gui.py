@@ -90,8 +90,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.source = ''
         xbmc.sleep( 60 )
         # search embedded lrc lyrics
+        self.lrc = True
         if ( self.settings[ "search_embedded" ] ):
-            lyrics, self.lrc = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), True)
+            lyrics = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), True)
             if ( lyrics ):
                 log('found embedded lrc lyrics')
                 self.source = __language__( 30002 )
@@ -108,7 +109,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         # search lrc lyrics by scrapers
         for self.scraper in self.scrapers:
             if self.scraper[3]:
-                lyrics, self.lrc = self.scraper[1].get_lyrics( artist, song )
+                lyrics = self.scraper[1].get_lyrics( artist, song )
                 self.source = self.scraper[2]
                 if ( lyrics ):
                     if ( isinstance( lyrics, basestring ) ):
@@ -119,8 +120,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     return
 
         # search embedded txt lyrics
+        self.lrc = False
         if ( self.settings[ "search_embedded" ] ):
-            lyrics, self.lrc = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), False)
+            lyrics = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), False)
             if ( lyrics ):
                 log('found embedded txt lyrics')
                 self.source = __language__( 30002 )
@@ -137,7 +139,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         # search txt lyrics by scrapers
         for self.scraper in self.scrapers:
             if not self.scraper[3]:
-                lyrics, self.lrc = self.scraper[1].get_lyrics( artist, song )
+                lyrics = self.scraper[1].get_lyrics( artist, song )
                 self.source = self.scraper[2]
                 if ( lyrics ):
                     log('found txt lyrics online')

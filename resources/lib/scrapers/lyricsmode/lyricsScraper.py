@@ -30,7 +30,7 @@ class LyricsFetcher:
                 if lyrics_found:
                     # if we're here, we found the lyrics page but it didn't
                     # contains the lyrics part (licensing issue or some bug)
-                    return None, False
+                    return None
 
                 # Let's try to use the research box if we didn't yet
                 if not 'search' in url:
@@ -54,7 +54,7 @@ class LyricsFetcher:
                         if match:
                             url = "http://www.lyricsmode.com/search.php" + match.group(1)
                         else:
-                            return None, False
+                            return None
 
             lyr = song_search.split("<div id='songlyrics_h' class='dn'>")[1].split('<!-- /SONG LYRICS -->')[0]
             lyr = self.clean_br_regex.sub( "\n", lyr ).strip()
@@ -66,7 +66,7 @@ class LyricsFetcher:
                 if line.find("Lyrics from:") < 0:
                     lir.append(line)
             lyrics = u"\n".join( lir )
-            return lyrics, False
+            return lyrics
         except:
             log( "%s: %s::%s (%d) [%s]" % (
                    __title__, self.__class__.__name__,
@@ -74,4 +74,4 @@ class LyricsFetcher:
                    sys.exc_info()[ 2 ].tb_lineno,
                    sys.exc_info()[ 1 ]
                    ))
-            return None, False
+            return None

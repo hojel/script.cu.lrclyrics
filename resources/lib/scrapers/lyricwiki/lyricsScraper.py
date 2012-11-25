@@ -26,7 +26,7 @@ class LyricsFetcher:
         try:
             self.page = data['url']
         except:
-            return None, False
+            return None
         if not self.page.endswith('action=edit'):
             log( "%s: search url: %s" % (__title__, self.page))
             try:
@@ -41,8 +41,8 @@ class LyricsFetcher:
                 htmlparser = HTMLParser.HTMLParser()
                 lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
                 lyrics = re.sub('<[^<]+?>', '', lyricstext)
-                return lyrics, False
+                return lyrics
             except:
-                return None, False
+                return None
         else:
-            return None, False
+            return None

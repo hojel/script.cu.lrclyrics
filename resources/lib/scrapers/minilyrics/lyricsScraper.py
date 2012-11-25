@@ -80,19 +80,19 @@ class LyricsFetcher:
         try:
             response = opener.open(req).read()
         except:
-            return None, True
+            return None
 
         lrcList = self.miniLyricsParser(response)
         links = []
         for x in lrcList:
             links.append( ( x[0] + ' - ' + x[1], x[2], x[0], x[1] ) )
         if len(links) == 0:
-            return None, True
+            return None
         elif len(links) == 1:
             lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics, True
+            return lyrics
         else:
-            return links, True
+            return links
 
     def get_lyrics_from_list(self, link):
         title,url,artist,song = link
