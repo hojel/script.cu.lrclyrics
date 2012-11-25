@@ -27,18 +27,16 @@ def log(txt):
 
 def get_settings():
     settings = {}
-    settings[ "scraper" ] = __addon__.getSetting( "scraper" )
     settings[ "save_lyrics" ] = __addon__.getSetting( "save_lyrics" ) == "true"
-    settings[ "lyrics_path" ] = __addon__.getSetting( "lyrics_path" )
-    if ( settings[ "lyrics_path" ] == "" ):
-        settings[ "lyrics_path" ] = os.path.join( BASE_DATA_PATH, "lyrics" )
-        __addon__.setSetting(id="lyrics_path", value=settings[ "lyrics_path" ])
-    settings[ "smooth_scrolling" ] = __addon__.getSetting( "smooth_scrolling" ) == "true"
-    settings[ "use_filename" ] = __addon__.getSetting( "use_filename" ) == "true"
-    settings[ "filename_format" ] = __addon__.getSetting( "filename_format" )
-    settings[ "artist_folder" ] = __addon__.getSetting( "artist_folder" ) == "true"
-    settings[ "subfolder" ] = __addon__.getSetting( "subfolder" ) == "true"
-    settings[ "subfolder_name" ] = __addon__.getSetting( "subfolder_name" )
+    settings[ "save_lyrics_path" ] = __addon__.getSetting( "save_lyrics_path" )
+    if ( settings[ "save_lyrics_path" ] == "" ):
+        settings[ "save_lyrics_path" ] = os.path.join( BASE_DATA_PATH, "lyrics" )
+        __addon__.setSetting(id="save_lyrics_path", value=settings[ "save_lyrics_path" ])
+    settings[ "save_artist_folder" ] = __addon__.getSetting( "save_artist_folder" ) == "true"
+    settings[ "read_filename" ] = __addon__.getSetting( "read_filename" ) == "true"
+    settings[ "read_filename_format" ] = __addon__.getSetting( "read_filename_format" )
+    settings[ "read_subfolder" ] = __addon__.getSetting( "read_subfolder" ) == "true"
+    settings[ "read_subfolder_path" ] = __addon__.getSetting( "read_subfolder_path" )
     return settings
 
 def get_textfile(filepath):

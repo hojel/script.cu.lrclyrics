@@ -146,9 +146,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
         dirname = os.path.dirname(path)
         basename = os.path.basename(path)
         filename = basename.rsplit( ".", 1 )[ 0 ]
-        if ( self.settings[ "subfolder" ] ):
+        if ( self.settings[ "read_subfolder" ] ):
             for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( dirname, self.settings[ "subfolder_name" ], filename + self.ext ), "utf-8" )
+                self.song_path = unicode( os.path.join( dirname, self.settings[ "read_subfolder_path" ], filename + self.ext ), "utf-8" )
                 self.check_file(self.song_path)
                 if self.found:
                     break
@@ -160,15 +160,15 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     break
         if self.found:
             return get_textfile( self.song_path )
-        if ( self.settings[ "artist_folder" ] ):
+        if ( self.settings[ "save_artist_folder" ] ):
             for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
+                self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
                 self.check_file(self.song_path)
                 if self.found:
                     break
         else:
             for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( self.settings[ "lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
+                self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
                 self.check_file(self.song_path)
                 if self.found:
                     break
@@ -277,17 +277,17 @@ class GUI( xbmcgui.WindowXMLDialog ):
             song = filename
             basename = os.path.basename( filename )
             # Artist - Song.ext
-            if ( self.settings[ "filename_format" ] == "0" ):
+            if ( self.settings[ "read_filename_format" ] == "0" ):
                 artist = basename.split( "-", 1 )[ 0 ].strip()
                 song = os.path.splitext( basename.split( "-", 1 )[ 1 ].strip() )[ 0 ]
             # Artist/Album/Song.ext or Artist/Album/Track Song.ext
-            elif ( self.settings[ "filename_format" ] in ( "1", "2", ) ):
+            elif ( self.settings[ "read_filename_format" ] in ( "1", "2", ) ):
                 artist = os.path.basename( os.path.split( os.path.split( filename )[ 0 ] )[ 0 ] )
                 # Artist/Album/Song.ext
-                if ( self.settings[ "filename_format" ] == "1" ):
+                if ( self.settings[ "read_filename_format" ] == "1" ):
                     song = os.path.splitext( basename )[ 0 ]
                 # Artist/Album/Track Song.ext
-                elif ( self.settings[ "filename_format" ] == "2" ):
+                elif ( self.settings[ "read_filename_format" ] == "2" ):
                     song = os.path.splitext( basename )[ 0 ].split( " ", 1 )[ 1 ]
         except:
             # invalid format selected
@@ -315,7 +315,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     songfile = xbmc.getInfoLabel('Player.Filenameandpath')
                 except:
                     pass
-                if ( song and ( not artist or self.settings[ "use_filename" ] ) ):
+                if ( song and ( not artist or self.settings[ "read_filename" ] ) ):
                     artist, song = self.get_artist_from_filename( songfile )
                 if ( song and ( self.song != song or self.artist != artist ) ):
                     self.artist = artist

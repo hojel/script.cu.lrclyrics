@@ -16,13 +16,13 @@
 		<setting id="lyricstime" type="bool" label="Lyrics Time" default="false"/>
 	</category>
 	<category label="30151">
-		<setting id="use_filename" type="bool" label="30106" default="false"/>
-		<setting id="filename_format" type="enum" label="30107" default="0" lvalues="30108|30109|30110" />
-		<setting id="subfolder" type="bool" label="30111" default="false"/>
+		<setting id="read_filename" type="bool" label="30106" default="false"/>
+		<setting id="read_filename_format" type="enum" label="30107" default="0" lvalues="30108|30109|30110" />
+		<setting id="read_subfolder" type="bool" label="30111" default="false"/>
+		<setting id="read_subfolder_path" type="text" enable="eq(-1,true)" label="30112" default="lyrics"/>
 		<setting type="sep" />
-		<setting id="subfolder_name" type="text" visible= "eq(-1,true)" enable="eq(-1,true)" label="30112" default="lyrics"/>
 		<setting id="save_lyrics" type="bool" label="30101" default="true"/>
-		<setting id="lyrics_path" type="folder" source="files" label="30102" default="" />
-		<setting id="artist_folder" type="bool" label="30104" default="true"/>
+		<setting id="save_lyrics_path" type="folder" enable="eq(-1,true)" source="files" label="30102" default="" />
+		<setting id="save_artist_folder" type="bool" enable="eq(-2,true)" label="30104" default="true"/>
 	</category>
 </settings>
