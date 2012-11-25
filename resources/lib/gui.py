@@ -96,7 +96,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if ( lyrics ):
                 log('found embedded lrc lyrics')
                 self.source = __language__( 30002 )
-                self.show_lrc_lyrics( lyrics )
+                self.show_lyrics( lyrics )
                 return
         # search lrc lyrics in file
         if ( self.settings[ "search_file" ] ):
@@ -104,7 +104,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if ( lyrics ):
                 log('found lrc lyrics from file')
                 self.source = __language__( 30000 )
-                self.show_lrc_lyrics( lyrics )
+                self.show_lyrics( lyrics )
                 return
         # search lrc lyrics by scrapers
         for self.scraper in self.scrapers:
@@ -114,7 +114,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     log('found lrc lyrics online')
                     self.source = self.scraper[2]
                     if ( isinstance( lyrics, basestring ) ):
-                        self.show_lrc_lyrics( lyrics, True )
+                        self.show_lyrics( lyrics, True )
                     elif ( isinstance( lyrics, list ) and lyrics ):
                         self.show_choices( lyrics )
                     return
@@ -152,7 +152,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
     def get_lyrics_from_list( self, item ):
         lyrics = self.scraper[1].get_lyrics_from_list( self.menu_items[ item ] )
         self.getControl( 110 ).reset()        
-        self.show_lrc_lyrics( lyrics, True )
+        self.show_lyrics( lyrics, True )
 
     def get_lyrics_from_file( self, artist, song, getlrc ):
         if getlrc:
@@ -197,27 +197,23 @@ class GUI( xbmcgui.WindowXMLDialog ):
             log( "failed to save lyrics" )
             return False
 
-    def show_lrc_lyrics( self, lyrics, save=False ):
+    def show_lyrics( self, lyrics, save=False ):
         self.getControl( 200 ).setLabel( self.source )
-        self.parser_lyrics( lyrics )
-        for time, line in self.pOverlay:
-            self.getControl( 110 ).addItem( line )
-        self.getControl( 110 ).selectItem( 0 )
-        if ( self.settings[ "save_lyrics" ] and save ):
-            success = self.save_lyrics_to_file( lyrics )
-        self.show_control( 110 )
-        if (self.allowtimer and self.getControl( 110 ).size() > 1):
-            self.refresh()
-
-    def show_lyrics(self, lyrics, save=False):
-        self.getControl( 200 ).setLabel( self.source )
-        if ( self.settings[ "save_lyrics" ] and save ):
-            success = self.save_lyrics_to_file( lyrics )
-        splitLyrics = lyrics.splitlines()
-        for x in splitLyrics:
-           self.getControl( 110 ).addItem( x )
+        if self.lrc:
+            self.parser_lyrics( lyrics )
+            for time, line in self.pOverlay:
+                self.getControl( 110 ).addItem( line )
+        else:
+            splitLyrics = lyrics.splitlines()
+            for x in splitLyrics:
+               self.getControl( 110 ).addItem( x )
         self.getControl( 110 ).selectItem( 0 )
         self.show_control( 110 )
+        if ( self.settings[ "save_lyrics" ] and save ):
+            success = self.save_lyrics_to_file( lyrics )
+        if self.lrc:
+            if (self.allowtimer and self.getControl( 110 ).size() > 1):
+                self.refresh()
 
     def parser_lyrics( self, lyrics):
         self.pOverlay = []
