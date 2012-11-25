@@ -27,7 +27,6 @@ class LyricsFetcher:
         except:
             return None, False
         if not self.page.endswith('action=edit'):
-#            log( "%s: search url: %s" % (__title__, self.page))
             req = urllib2.urlopen(self.page)
             response = req.read()
             req.close()

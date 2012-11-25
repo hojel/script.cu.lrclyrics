@@ -188,8 +188,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             lyrics_file.write( lyrics.encode('utf-8') )
             lyrics_file.close()
             return True
-        except IOError:
-            log( "%s::%s (%d) [%s]" % (self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ]) )
+        except:
+            log( "failed to save lyrics" )
             return False
 
     def show_lrc_lyrics( self, lyrics, label, save=False ):
@@ -287,7 +287,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     song = os.path.splitext( basename )[ 0 ].split( " ", 1 )[ 1 ]
         except:
             # invalid format selected
-            log( "%s::%s (%d) [%s]" % (self.__class__.__name__, sys.exc_info()[ 2 ].tb_frame.f_code.co_name, sys.exc_info()[ 2 ].tb_lineno, sys.exc_info()[ 1 ]) )
+            log( "failed to get artist and song from filename" )
         return artist, song
 
     def getMyPlayer( self ):
