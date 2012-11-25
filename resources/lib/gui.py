@@ -88,10 +88,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.reset_controls()
         self.menu_items = []
         xbmc.sleep( 60 )
-        try:
-            lyrics, self.lrc =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
-        except:
-            lyrics = None
+        lyrics, self.lrc =  getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
         if ( lyrics ):
             log('found embedded lyrics')
             label = __language__( 30002 )

@@ -6,7 +6,10 @@ import xbmcvfs
 from mutagen.mp3 import MP3
 
 def getEmbedLyrics(filename):
-    lyrics, lrc = getLyrics3(filename)
+    try:
+        lyrics, lrc = getLyrics3(filename)
+    except:
+        lyrics = None
     if (not lyrics):
         lyrics, lrc = getID3Lyrics(filename)
     if (lyrics):
