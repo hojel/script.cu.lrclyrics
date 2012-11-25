@@ -153,21 +153,4 @@ class LyricsFetcher:
         url = 'http://lrcct2.ttplayer.com/dll/lyricsvr.dll?dl?Id=%d&Code=%d&uid=01&mac=%012x' %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
         f = urllib.urlopen(url)
         Page = f.read()
-        #lyrics_alt = re.compile('\[.*?\]')
-        #lyrics = lyrics_alt.sub('', Page)
-        #return lyrics
         return Page
-
-if ( __name__ == '__main__' ):
-    # used to test get_lyrics() 
-    artist = u"许巍".encode('utf8')
-    song = u"蓝莲花".encode('utf8')
-
-    lyrics = LyricsFetcher().get_lyrics( artist, song )
-    if ( isinstance( lyrics, list ) ):
-        for song in lyrics:
-            print song
-    else:
-        print lyrics
-
-    LyricsFetcher().get_lyrics_from_list(lyrics[0])

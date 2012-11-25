@@ -45,17 +45,3 @@ class LyricsFetcher:
         f = urllib.urlopen(url)
         Page = f.read()
         return Page
-
-if ( __name__ == '__main__' ):
-    # used to test get_lyrics() 
-    artist = "Groove Coverage"
-    song = "God Is A Girl"
-
-    lyrics = LyricsFetcher().get_lyrics( artist, song )
-    if ( isinstance( lyrics, list ) ):
-        for song in lyrics:
-            print song
-    else:
-        print lyrics
-
-    LyricsFetcher().get_lyrics_from_list(lyrics[0])

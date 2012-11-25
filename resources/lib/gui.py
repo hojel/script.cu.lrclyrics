@@ -39,7 +39,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.song = None
         self.controlId = -1
         self.pOverlay = []
-        self.extensions = ['.lrc','.txt']
         self.scrapers = []
 
     def refresh(self):
