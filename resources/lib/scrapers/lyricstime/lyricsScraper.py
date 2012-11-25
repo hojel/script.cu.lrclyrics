@@ -5,6 +5,7 @@ import re
 from utilities import *
 
 __title__ = 'lyricstime'
+__priority__ = '210'
 
 class LyricsFetcher:
     def __init__( self ):
@@ -33,4 +34,4 @@ class LyricsFetcher:
                                         sys.exc_info()[ 2 ].tb_lineno,
                                         sys.exc_info()[ 1 ]
                                         ))
-            return '', False
+            return None, False

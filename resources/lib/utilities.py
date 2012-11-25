@@ -6,10 +6,12 @@ import xbmc, xbmcvfs
 __addon__     = sys.modules[ "__main__" ].__addon__
 __addonname__ = sys.modules[ "__main__" ].__addonname__
 __profile__   = sys.modules[ "__main__" ].__profile__
+__cwd__       = sys.modules[ "__main__" ].__cwd__
 
 # base paths
 BASE_DATA_PATH = sys.modules[ "__main__" ].__profile__
 CANCEL_DIALOG  = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
+LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "scrapers")
 
 def _create_base_paths():
     """ creates the base folders """

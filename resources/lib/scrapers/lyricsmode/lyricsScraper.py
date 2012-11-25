@@ -5,6 +5,7 @@ import re
 from utilities import *
 
 __title__ = 'lyricsmode'
+__priority__ = '220'
 
 class LyricsFetcher:
     def __init__( self ):
@@ -28,7 +29,7 @@ class LyricsFetcher:
                 if lyrics_found:
                     # if we're here, we found the lyrics page but it didn't
                     # contains the lyrics part (licensing issue or some bug)
-                    return None, "No lyrics found"
+                    return None, False
 
                 # Let's try to use the research box if we didn't yet
                 if not 'search' in url:
@@ -52,7 +53,7 @@ class LyricsFetcher:
                         if match:
                             url = "http://www.lyricsmode.com/search.php" + match.group(1)
                         else:
-                            return None, "No lyrics found", __title__
+                            return None, False
 
             lyr = song_search.split("<div id='songlyrics_h' class='dn'>")[1].split('<!-- /SONG LYRICS -->')[0]
             lyr = self.clean_br_regex.sub( "\n", lyr ).strip()
@@ -72,4 +73,4 @@ class LyricsFetcher:
                    sys.exc_info()[ 2 ].tb_lineno,
                    sys.exc_info()[ 1 ]
                    ))
-            return '', False
+            return None, False

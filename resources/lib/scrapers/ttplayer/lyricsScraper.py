@@ -9,8 +9,10 @@ import os
 import urllib
 import re
 import random
+from utilities import *
 
 __title__ = "ttplayer.com"
+__priority__ = '100'
 
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)",
                     "\([^\)]*mix\)", "\([^\)]*version\)",
@@ -136,13 +138,13 @@ class LyricsFetcher:
         for x in urls:
             links.append( ( x[1] + ' - ' + x[2], x[0], x[1], x[2] ) )
         if len(links) == 0:
-            lyrics = ""
+            lyrics = None
             return lyrics, True
         elif len(links) == 1:
             lyrics = self.get_lyrics_from_list(links[0])
             return lyrics, True
         else:
-            return links
+            return links, True
 
     def get_lyrics_from_list(self, link):
         title,Id,artist,song = link

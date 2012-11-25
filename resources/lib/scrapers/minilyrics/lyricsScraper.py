@@ -10,8 +10,10 @@ import urllib2
 import re
 from hashlib import md5
 import chardet
+from utilities import *
 
 __title__ = "MiniLyrics"
+__priority__ = '110'
 
 class LyricsFetcher:
     def __init__( self ):
@@ -77,19 +79,19 @@ class LyricsFetcher:
         try:
             response = opener.open(req).read()
         except:
-            return ""
+            return None, True
 
         lrcList = self.miniLyricsParser(response)
         links = []
         for x in lrcList:
             links.append( ( x[0] + ' - ' + x[1], x[2], x[0], x[1] ) )
         if len(links) == 0:
-            return "", True
+            return None, True
         elif len(links) == 1:
             lyrics = self.get_lyrics_from_list(links[0])
             return lyrics, True
         else:
-            return links
+            return links, True
 
     def get_lyrics_from_list(self, link):
         title,url,artist,song = link

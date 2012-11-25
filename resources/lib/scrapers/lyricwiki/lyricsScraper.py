@@ -8,6 +8,7 @@ else:
 from utilities import *
 
 __title__ = 'lyricwiki'
+__priority__ = '200'
 
 socket.setdefaulttimeout(10)
 
@@ -24,9 +25,9 @@ class LyricsFetcher:
         try:
             self.page = data['url']
         except:
-            return '', False
+            return None, False
         if not self.page.endswith('action=edit'):
-            log( "%s: search url: %s" % (__title__, self.page))
+#            log( "%s: search url: %s" % (__title__, self.page))
             req = urllib2.urlopen(self.page)
             response = req.read()
             req.close()
@@ -38,6 +39,6 @@ class LyricsFetcher:
                 lyrics = re.sub('<[^<]+?>', '', lyricstext)
                 return lyrics, False
             except:
-                return '', False
+                return None, False
         else:
-            return '', False
+            return None, False
