@@ -92,7 +92,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         # search embedded lrc lyrics
         self.lrc = True
         if ( self.settings[ "search_embedded" ] ):
-            lyrics = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), True)
+            lyrics = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
             if ( lyrics ):
                 log('found embedded lrc lyrics')
                 self.source = __language__( 30002 )
@@ -122,8 +122,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
         # search embedded txt lyrics
         self.lrc = False
         if ( self.settings[ "search_embedded" ] ):
-            lyrics = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), False)
-            if ( lyrics ):
+            lyrics = xbmc.getInfoLabel( "MusicPlayer.Lyrics" )
+            if lyrics:
                 log('found embedded txt lyrics')
                 self.source = __language__( 30002 )
                 self.show_lyrics( lyrics )
@@ -320,7 +320,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 try:
                     song = xbmc.Player().getMusicInfoTag().getTitle()
                     artist = xbmc.Player().getMusicInfoTag().getArtist()
-                    print "Song: " + song + " /Artist: " + artist
+                    log("Artist: %s - Song: %s" % (artist, song))
 
                     songfile = xbmc.getInfoLabel('Player.Filenameandpath')
                 except:
