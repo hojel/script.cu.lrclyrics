@@ -3,22 +3,17 @@ import re
 import chardet
 from tagger import *
 import xbmcvfs
-from mutagen.mp3 import MP3
 
 def getEmbedLyrics(filename):
     try:
         lyrics, lrc = getLyrics3(filename)
     except:
         lyrics = None
-    if (not lyrics):
-        lyrics, lrc = getID3Lyrics(filename)
-    if (lyrics):
+    if lyrics:
         enc = chardet.detect(lyrics)
-        if (enc['encoding'] == 'utf-8'):
-            return lyrics, lrc
-        else:
-            return unicode( lyrics, enc['encoding'] ).encode( "utf-8"), lrc
-    return None, lrc
+        return lyrics.decode(enc['encoding']), lrc
+    else:        
+        return = getID3Lyrics(filename)
 
 """
 Get LRC lyrics embed with Lyrics3/Lyrics3V2 format
@@ -82,11 +77,13 @@ See: http://id3.org/id3v2.3.0
 def getID3Lyrics(filename):
     id3 = ID3v2(filename)
     if id3.version == 2.2:
-        sylt="SLT"
-        uslt="ULT"
+        sylt = "SLT"
+        uslt = "ULT"
+        txxx = "TXX"
     else:
-        sylt="SYLT"
-        uslt="USLT"
+        sylt = "SYLT"
+        uslt = "USLT"
+        txxx = "TXXX"
     for tag in id3.frames:
         if tag.fid == sylt:
             enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
@@ -114,25 +111,45 @@ def getID3Lyrics(filename):
                 for x in range(4):
                     timems += (256)**(3-x) * ord(time[x])
                 lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
-                content=content[pos+5:]
-            return lyrics.encode( "utf-8"), True
-        elif tag.fid == "TXXX":
+                content = content[pos+5:]
+            return lyrics, True
+        elif tag.fid == txxx:
+            """
+            Frame data in rawdata[]:
+            Text encoding     $xx
+            Description       <textstring> $00 (00)
+            Value             <textstring>
+            """
             enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
             raw = tag.rawdata[1:]
             utf16 = bool(enc.find('16') != -1)
             pos = endOfString(raw, utf16)
-            name = raw[:pos].decode(enc)
+            desc = raw[:pos].decode(enc)
             if utf16:
                 pos += 1
-            if (len(name) == 6 and name.lower() == "lyrics"):
+            if (len(desc) == 6 and desc.lower() == "lyrics"):
                 lyrics = raw[pos+1:]
                 if (enc == 'latin_1'):
                     enc = chardet.detect(lyrics)['encoding']
-                return lyrics.decode(enc).encode( "utf-8"), True
+                return lyrics.decode(enc), True
         elif tag.fid == uslt:
-            id3 = MP3(filename)
-            for key in id3.keys():           # all keys in the file
-                if re.search("USLT:", key):  # find USLT key
-                    lyrics = id3[key].text   # unicode
-                    return lyrics.encode("utf-8"), False
+            """
+            Frame data in rawdata[]:
+            Text encoding        $xx
+            Language             $xx xx xx
+            Content descriptor   <textstring> $00 (00)
+            Lyrics/text          <textstring>
+            """
+            enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
+            lang = tag.rawdata[1:4]
+            raw = tag.rawdata[4:]
+            utf16 = bool(enc.find('16') != -1)
+            pos = endOfString(raw, utf16)
+            desc = raw[:pos]
+            if utf16:
+                pos += 1
+            lyrics = raw[pos+1:]
+            if (enc == 'latin_1'):
+                enc = chardet.detect(lyrics)['encoding']
+            return lyrics.decode(enc), False
     return None, True
