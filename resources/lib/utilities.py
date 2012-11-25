@@ -8,15 +8,13 @@ __addonname__ = sys.modules[ "__main__" ].__addonname__
 __profile__   = sys.modules[ "__main__" ].__profile__
 __cwd__       = sys.modules[ "__main__" ].__cwd__
 
-# base paths
-BASE_DATA_PATH = sys.modules[ "__main__" ].__profile__
 CANCEL_DIALOG  = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
 LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "scrapers")
 
 def _create_base_paths():
     """ creates the base folders """
-    if ( not xbmcvfs.exists( BASE_DATA_PATH.decode("utf-8") ) ):
-        xbmcvfs.mkdirs( BASE_DATA_PATH.decode("utf-8") )
+    if ( not xbmcvfs.exists( __profile__.encode("utf-8") ) ):
+        xbmcvfs.mkdirs( __profile__.encode("utf-8") )
 _create_base_paths()
 
 def log(txt):
@@ -30,7 +28,7 @@ def get_settings():
     settings[ "save_lyrics" ] = __addon__.getSetting( "save_lyrics" ) == "true"
     settings[ "save_lyrics_path" ] = __addon__.getSetting( "save_lyrics_path" )
     if ( settings[ "save_lyrics_path" ] == "" ):
-        settings[ "save_lyrics_path" ] = os.path.join( BASE_DATA_PATH.encode("utf-8"), "lyrics" )
+        settings[ "save_lyrics_path" ] = os.path.join( __profile__.encode("utf-8"), "lyrics" )
         __addon__.setSetting(id="save_lyrics_path", value=settings[ "save_lyrics_path" ])
     settings[ "save_artist_folder" ] = __addon__.getSetting( "save_artist_folder" ) == "true"
     settings[ "read_filename" ] = __addon__.getSetting( "read_filename" ) == "true"
