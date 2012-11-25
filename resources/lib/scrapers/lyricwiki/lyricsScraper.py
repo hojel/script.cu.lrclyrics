@@ -28,8 +28,12 @@ class LyricsFetcher:
         except:
             return None, False
         if not self.page.endswith('action=edit'):
-            req = urllib2.urlopen(self.page)
-            response = req.read()
+            log( "%s: search url: %s" % (__title__, self.page))
+            try:
+                req = urllib2.urlopen(self.page)
+                response = req.read()
+            except urllib2.HTTPError, error: # strange... sometimes lyrics are returned with a 404 error
+                response = error.read()
             req.close()
             matchcode = re.search('lyricbox.*?div>(.*?)<!--', response)
             try:
