@@ -199,10 +199,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
     def show_lrc_lyrics( self, lyrics, save=False ):
         self.getControl( 200 ).setLabel( self.source )
         self.parser_lyrics( lyrics )
-        lyrics1 = ""
         for time, line in self.pOverlay:
             self.getControl( 110 ).addItem( line )
-            lyrics1 += line + '\n'
         self.getControl( 110 ).selectItem( 0 )
         if ( self.settings[ "save_lyrics" ] and save ):
             success = self.save_lyrics_to_file( lyrics )
