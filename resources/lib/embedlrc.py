@@ -4,16 +4,18 @@ import chardet
 from tagger import *
 import xbmcvfs
 
-def getEmbedLyrics(filename):
-    try:
-        lyrics, lrc = getLyrics3(filename)
-    except:
-        lyrics = None
+def getEmbedLyrics(filename, getlrc):
+    lyrics = None
+    if getlrc:
+        try:
+            lyrics = getLyrics3(filename)
+        except:
+            pass
     if lyrics:
         enc = chardet.detect(lyrics)
-        return lyrics.decode(enc['encoding']), lrc
+        return lyrics.decode(enc['encoding']), True
     else:        
-        return getID3Lyrics(filename)
+        return getID3Lyrics(filename, getlrc)
 
 """
 Get LRC lyrics embed with Lyrics3/Lyrics3V2 format
@@ -33,7 +35,7 @@ def getLyrics3(filename):
         buf = f.read(5100+11)
         f.close();
         start = buf.find("LYRICSBEGIN")
-        return buf[start+11:], True
+        return buf[start+11:]
     elif (buf == "LYRICS200"):
         """ Find Lyrics3v2 """
         f.seek(-9-6, os.SEEK_CUR)
@@ -48,10 +50,10 @@ def getLyrics3(filename):
                 length = int(buf[3:8])
                 content = buf[8:8+length]
                 if (tag == 'LYR'):
-                    return content, True
+                    return content
                 buf = buf[8+length:]
     f.close();
-    return None, True
+    return None
 
 def endOfString(string, utf16=False):
     if (utf16):
@@ -74,7 +76,7 @@ def ms2timestamp(ms):
 Get USLT/SYLT/TXXX lyrics embed with ID3v2 format
 See: http://id3.org/id3v2.3.0
 """
-def getID3Lyrics(filename):
+def getID3Lyrics(filename, getlrc):
     id3 = ID3v2(filename)
     if id3.version == 2.2:
         sylt = "SLT"
@@ -85,53 +87,54 @@ def getID3Lyrics(filename):
         uslt = "USLT"
         txxx = "TXXX"
     for tag in id3.frames:
-        if tag.fid == sylt:
-            enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
-            lang = tag.rawdata[1:4]
-            format = tag.rawdata[4]
-            ctype = tag.rawdata[5]
-            raw = tag.rawdata[6:]
-            utf16 = bool(enc.find('16') != -1)
-            pos = endOfString(raw, utf16)
-            desc = raw[:pos]
-            if utf16:
-                pos += 1
-            content = raw[pos+1:]
-            del raw
-            lyrics = ""
-            while content != "":
-                pos = endOfString(content, utf16)
-                if (enc == 'latin_1'):
-                    enc = chardet.detect(content[:pos])['encoding']
-                text = content[:pos].decode(enc)
+        if getlrc:
+            if tag.fid == sylt:
+                enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
+                lang = tag.rawdata[1:4]
+                format = tag.rawdata[4]
+                ctype = tag.rawdata[5]
+                raw = tag.rawdata[6:]
+                utf16 = bool(enc.find('16') != -1)
+                pos = endOfString(raw, utf16)
+                desc = raw[:pos]
                 if utf16:
                     pos += 1
-                time = content[pos+1:pos+5]
-                timems = 0
-                for x in range(4):
-                    timems += (256)**(3-x) * ord(time[x])
-                lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
-                content = content[pos+5:]
-            return lyrics, True
-        elif tag.fid == txxx:
-            """
-            Frame data in rawdata[]:
-            Text encoding     $xx
-            Description       <textstring> $00 (00)
-            Value             <textstring>
-            """
-            enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
-            raw = tag.rawdata[1:]
-            utf16 = bool(enc.find('16') != -1)
-            pos = endOfString(raw, utf16)
-            desc = raw[:pos].decode(enc)
-            if utf16:
-                pos += 1
-            if (len(desc) == 6 and desc.lower() == "lyrics"):
-                lyrics = raw[pos+1:]
-                if (enc == 'latin_1'):
-                    enc = chardet.detect(lyrics)['encoding']
-                return lyrics.decode(enc), True
+                content = raw[pos+1:]
+                del raw
+                lyrics = ""
+                while content != "":
+                    pos = endOfString(content, utf16)
+                    if (enc == 'latin_1'):
+                        enc = chardet.detect(content[:pos])['encoding']
+                    text = content[:pos].decode(enc)
+                    if utf16:
+                        pos += 1
+                    time = content[pos+1:pos+5]
+                    timems = 0
+                    for x in range(4):
+                        timems += (256)**(3-x) * ord(time[x])
+                    lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
+                    content = content[pos+5:]
+                return lyrics, True
+            elif tag.fid == txxx:
+                """
+                Frame data in rawdata[]:
+                Text encoding     $xx
+                Description       <textstring> $00 (00)
+                Value             <textstring>
+                """
+                enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
+                raw = tag.rawdata[1:]
+                utf16 = bool(enc.find('16') != -1)
+                pos = endOfString(raw, utf16)
+                desc = raw[:pos].decode(enc)
+                if utf16:
+                    pos += 1
+                if (len(desc) == 6 and desc.lower() == "lyrics"):
+                    lyrics = raw[pos+1:]
+                    if (enc == 'latin_1'):
+                        enc = chardet.detect(lyrics)['encoding']
+                    return lyrics.decode(enc), True
         elif tag.fid == uslt:
             """
             Frame data in rawdata[]:

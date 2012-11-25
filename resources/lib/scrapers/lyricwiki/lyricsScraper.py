@@ -9,6 +9,7 @@ from utilities import *
 
 __title__ = 'lyricwiki'
 __priority__ = '200'
+__lrc__ = False
 
 socket.setdefaulttimeout(10)
 

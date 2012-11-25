@@ -6,6 +6,7 @@ from utilities import *
 
 __title__ = 'lyricstime'
 __priority__ = '210'
+__lrc__ = False
 
 class LyricsFetcher:
     def __init__( self ):

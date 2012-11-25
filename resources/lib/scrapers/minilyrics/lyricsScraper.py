@@ -14,6 +14,7 @@ from utilities import *
 
 __title__ = "MiniLyrics"
 __priority__ = '110'
+__lrc__ = True
 
 class LyricsFetcher:
     def __init__( self ):

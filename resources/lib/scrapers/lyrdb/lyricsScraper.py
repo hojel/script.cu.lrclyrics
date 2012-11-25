@@ -12,6 +12,7 @@ from utilities import *
 
 __title__ = "lyrdb.com"
 __priority__ = '120'
+__lrc__ = True
 
 class LyricsFetcher:
     def __init__( self ):

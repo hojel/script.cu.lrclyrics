@@ -13,6 +13,7 @@ from utilities import *
 
 __title__ = "ttplayer.com"
 __priority__ = '100'
+__lrc__ = True
 
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)",
                     "\([^\)]*mix\)", "\([^\)]*version\)",

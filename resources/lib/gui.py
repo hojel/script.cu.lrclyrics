@@ -28,7 +28,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         for scraper in os.listdir(LYRIC_SCRAPER_DIR):
             if os.path.isdir(os.path.join(LYRIC_SCRAPER_DIR, scraper)) and __addon__.getSetting( scraper ) == "true":
                 exec ( "from scrapers.%s import lyricsScraper as lyricsScraper_%s" % (scraper, scraper))
-                exec ( "self.scrapers.append([lyricsScraper_%s.__priority__,lyricsScraper_%s.LyricsFetcher(),lyricsScraper_%s.__title__])" % (scraper, scraper, scraper))
+                exec ( "self.scrapers.append([lyricsScraper_%s.__priority__,lyricsScraper_%s.LyricsFetcher(),lyricsScraper_%s.__title__,lyricsScraper_%s.__lrc__])" % (scraper, scraper, scraper, scraper))
                 self.scrapers.sort()
 
     def setup_variables( self ):
@@ -86,43 +86,66 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 pass
 
     def find_lyrics(self, artist, song):
+        self.source = ''
         self.reset_controls()
         self.menu_items = []
         xbmc.sleep( 60 )
+        # search embedded lrc lyrics
         if ( self.settings[ "search_embedded" ] ):
-            lyrics, self.lrc = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
+            lyrics, self.lrc = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), True)
             if ( lyrics ):
-                log('found embedded lyrics')
-                label = __language__( 30002 )
-                if self.lrc:
-                    self.show_lrc_lyrics( lyrics, label )
-                else:
-                    self.show_lyrics( lyrics, label )
+                log('found embedded lrc lyrics')
+                self.source = __language__( 30002 )
+                self.show_lrc_lyrics( lyrics, label )
                 return
+        # search lrc lyrics in file
         if ( self.settings[ "search_file" ] ):
             lyrics = self.get_lyrics_from_file(artist, song)
             if ( lyrics ):
-                log('found lyrics from file')
-                label = __language__( 30000 )
-                if self.lrc:
-                    self.show_lrc_lyrics( lyrics, label )
-                else:
-                    self.show_lyrics( lyrics, label )
+                log('found lrc lyrics from file')
+                self.source = __language__( 30000 )
+                self.show_lrc_lyrics( lyrics, label )
                 return
+        # search lrc lyrics by scrapers
         for scraper in self.scrapers:
-            lyrics, self.lrc = scraper[1].get_lyrics( artist, song )
-            self.title = scraper[2]
-            if ( lyrics ):
-                if ( isinstance( lyrics, basestring ) ):
-                    log('found lyrics online')
-                    label = self.title
-                    if self.lrc:
+            if scraper[3]:
+                lyrics, self.lrc = scraper[1].get_lyrics( artist, song )
+                self.source = scraper[2]
+                if ( lyrics ):
+                    if ( isinstance( lyrics, basestring ) ):
+                        log('found lrc lyrics online')
+                        label = self.title
                         self.show_lrc_lyrics( lyrics, label, True )
-                    else:
-                        self.show_lyrics( lyrics, label, True )
-                elif ( isinstance( lyrics, list ) and lyrics ):
-                    self.show_choices( lyrics )
+                    elif ( isinstance( lyrics, list ) and lyrics ):
+                        self.show_choices( lyrics )
+                    return
+
+        # search embedded txt lyrics
+        if ( self.settings[ "search_embedded" ] ):
+            lyrics, self.lrc = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"), False)
+            if ( lyrics ):
+                log('found embedded txt lyrics')
+                self.source = __language__( 30002 )
+                self.show_lyrics( lyrics, label )
                 return
+        # search txt lyrics in file
+        if ( self.settings[ "search_file" ] ):
+            lyrics = self.get_lyrics_from_file(artist, song, False)
+            if ( lyrics ):
+                log('found txt lyrics from file')
+                self.source = __language__( 30000 )
+                self.show_lyrics( lyrics, label )
+                return
+        # search txt lyrics by scrapers
+        for scraper in self.scrapers:
+            if not scraper[3]:
+                lyrics, self.lrc = scraper[1].get_lyrics( artist, song )
+                self.source = scraper[2]
+                if ( lyrics ):
+                    log('found txt lyrics online')
+                    label = self.title
+                    self.show_lyrics( lyrics, label, True )
+                    return
         log('no lyrics found')
         self.getControl( 100 ).setText( __language__( 30001 ) )
         self.show_control( 100 )
@@ -133,51 +156,29 @@ class GUI( xbmcgui.WindowXMLDialog ):
         label = self.title
         self.show_lrc_lyrics( lyrics, label, True )
 
-    def check_file( self, path ):
-        if xbmcvfs.exists(self.song_path):
-            self.found = True
-            if self.ext == '.lrc':
-                self.lrc = True
-            else:
-                self.lrc = False
+    def get_lyrics_from_file( self, artist, song, getlrc ):
+        if getlrc:
+            ext = '.lrc'
         else:
-            self.found = False
-
-    def get_lyrics_from_file( self, artist, song ):
+            ext = '.txt'
         path = xbmc.getInfoLabel('Player.Filenameandpath')
         dirname = os.path.dirname(path)
         basename = os.path.basename(path)
         filename = basename.rsplit( ".", 1 )[ 0 ]
         if ( self.settings[ "read_subfolder" ] ):
-            for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( dirname, self.settings[ "read_subfolder_path" ], filename + self.ext ), "utf-8" )
-                self.check_file(self.song_path)
-                if self.found:
-                    break
+            self.song_path = unicode( os.path.join( dirname, self.settings[ "read_subfolder_path" ], filename + ext ), "utf-8" )
         else:
-            for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( dirname, filename + self.ext ), "utf-8" )
-                self.check_file(self.song_path)
-                if self.found:
-                    break
-        if self.found:
+            self.song_path = unicode( os.path.join( dirname, filename + ext ), "utf-8" )
+        if xbmcvfs.exists(self.song_path):
             return get_textfile( self.song_path )
         if ( self.settings[ "save_artist_folder" ] ):
-            for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
-                self.check_file(self.song_path)
-                if self.found:
-                    break
+            self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + ext ), "utf-8" )
         else:
-            for self.ext in self.extensions:
-                self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + self.ext ), "utf-8" )
-                self.check_file(self.song_path)
-                if self.found:
-                    break
-        if self.found:
+            self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + ext ), "utf-8" )
+        if xbmcvfs.exists(self.song_path):
             return get_textfile( self.song_path )
         else:
-            return None            
+            return None
 
     def save_lyrics_to_file( self, lyrics ):
         try:
