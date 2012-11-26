@@ -6,6 +6,7 @@ taxigps
 """
 
 import os
+import socket
 import urllib
 import re
 import random
@@ -14,6 +15,8 @@ from utilities import *
 __title__ = "ttplayer.com"
 __priority__ = '100'
 __lrc__ = True
+
+socket.setdefaulttimeout(10)
 
 LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)",
                     "\([^\)]*mix\)", "\([^\)]*version\)",
@@ -160,7 +163,16 @@ class LyricsFetcher:
     def get_lyrics_from_list(self, link):
         title,Id,artist,song = link
         log('%s %s %s' %(Id, artist, song))
-        url = self.LYRIC_URL %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
-        f = urllib.urlopen(url)
-        Page = f.read()
+        try:
+            url = self.LYRIC_URL %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
+            f = urllib.urlopen(url)
+            Page = f.read()
+        except:
+            log( "%s: %s::%s (%d) [%s]" % (
+                   __title__, self.__class__.__name__,
+                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                   sys.exc_info()[ 2 ].tb_lineno,
+                   sys.exc_info()[ 1 ]
+                   ))
+            return None
         return Page

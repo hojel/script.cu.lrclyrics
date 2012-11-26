@@ -7,6 +7,7 @@ taxigps
 
 import urllib
 import urllib2
+import socket
 import re
 from hashlib import md5
 import chardet
@@ -15,6 +16,8 @@ from utilities import *
 __title__ = "MiniLyrics"
 __priority__ = '110'
 __lrc__ = True
+
+socket.setdefaulttimeout(10)
 
 class LyricsFetcher:
     def __init__( self ):
@@ -68,7 +71,6 @@ class LyricsFetcher:
         md5hash = md5(xml+"Mlv1clt4.0").digest()
         request = "\x02\x00\x04\x00\x00\x00%s%s" % (md5hash, xml)
         del md5hash,xml
-    
         url = "http://www.viewlyrics.com:1212/searchlyrics.htm"
         #url = "http://search.crintsoft.com/searchlyrics.htm"
         req = urllib2.Request(url,request)
@@ -96,8 +98,17 @@ class LyricsFetcher:
 
     def get_lyrics_from_list(self, link):
         title,url,artist,song = link
-        f = urllib.urlopen(url)
-        lyrics = f.read()
+        try:
+            f = urllib.urlopen(url)
+            lyrics = f.read()
+        except:
+            log( "%s: %s::%s (%d) [%s]" % (
+                   __title__, self.__class__.__name__,
+                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                   sys.exc_info()[ 2 ].tb_lineno,
+                   sys.exc_info()[ 1 ]
+                   ))
+            return None
         enc = chardet.detect(lyrics)
         if (enc['encoding'] == 'utf-8'):
             return lyrics

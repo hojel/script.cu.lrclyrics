@@ -19,8 +19,11 @@ class LyricsFetcher:
 
     def get_lyrics(self, artist, song):
         log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
-        req = urllib2.urlopen(self.url % (urllib2.quote(artist), urllib2.quote(song)))
-        response = req.read()
+        try:
+            req = urllib2.urlopen(self.url % (urllib2.quote(artist), urllib2.quote(song)))
+            response = req.read()
+        except:
+            return None
         req.close()
         data = simplejson.loads(response)
         try:
@@ -33,7 +36,10 @@ class LyricsFetcher:
                 req = urllib2.urlopen(self.page)
                 response = req.read()
             except urllib2.HTTPError, error: # strange... sometimes lyrics are returned with a 404 error
-                response = error.read()
+                if error.code == 404:
+                    response = error.read()
+                else:
+                    return None
             req.close()
             matchcode = re.search('lyricbox.*?div>(.*?)<!--', response)
             try:
