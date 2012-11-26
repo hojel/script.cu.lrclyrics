@@ -73,16 +73,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 110 ).setVisible( controlId == 110 )
         self.getControl( 120 ).setVisible( controlId == 120 )
         xbmc.sleep( 5 )
-        if controlId != 100:
+        if controlId == 110:
             try:
                 self.setFocus( self.getControl( controlId + 1 ) )
             except:
                 self.setFocus( self.getControl( controlId ) )
-        else:
+        elif controlId == 100:
             try:
                 self.setFocus( self.getControl( 605 ) )
             except:
                 pass
+        else:
+                self.setFocus( self.getControl( controlId ) )
 
     def find_lyrics(self, artist, song):
         self.reset_controls()
