@@ -129,9 +129,18 @@ class LyricsFetcher:
         song = song.strip().replace('`','').replace('/','')
         artist = artist.strip().replace('`','').replace('/','')
 
-        url = 'http://lrcct2.ttplayer.com/dll/lyricsvr.dll?sh?Artist=%s&Title=%s&Flags=0' %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(song.replace(' ','').lower()))
-        f = urllib.urlopen(url)
-        Page = f.read()
+        try:
+            url = 'http://lrcct2.ttplayer.com/dll/lyricsvr.dll?sh?Artist=%s&Title=%s&Flags=0' %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(song.replace(' ','').lower()))
+            f = urllib.urlopen(url)
+            Page = f.read()
+        except:
+            log( "%s: %s::%s (%d) [%s]" % (
+                   __title__, self.__class__.__name__,
+                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                   sys.exc_info()[ 2 ].tb_lineno,
+                   sys.exc_info()[ 1 ]
+                   ))
+            return None
 
         links_query = re.compile('<lrc id=\"(.*?)\" artist=\"(.*?)\" title=\"(.*?)\"></lrc>')
         urls = re.findall(links_query, Page)
