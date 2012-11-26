@@ -278,7 +278,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         actionId = action.getId()
         if ( actionId in CANCEL_DIALOG ):
             self.exit_script()
-        elif ( actionId == 101 ): # ACTION_MOUSE_RIGHT_CLICK
+        elif ( actionId == 101 ) or ( actionId == 117 ): # ACTION_MOUSE_RIGHT_CLICK / ACTION_CONTEXT_MENU
             self.reshow_choices()
 
     def get_artist_from_filename( self, filename ):
