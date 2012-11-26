@@ -40,7 +40,7 @@ class LyricsFetcher:
 
     def get_lyrics_from_list(self, link):
         title,Id,artist,song = link
-        print Id, artist, song
+        log(Id, artist, song)
         url = 'http://www.lyrdb.com/karaoke/downloadlrc.php?q=%s' %(Id)
         f = urllib.urlopen(url)
         Page = f.read()

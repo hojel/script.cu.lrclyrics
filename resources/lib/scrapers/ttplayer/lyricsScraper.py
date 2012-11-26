@@ -149,7 +149,7 @@ class LyricsFetcher:
 
     def get_lyrics_from_list(self, link):
         title,Id,artist,song = link
-        print Id, artist, song
+        log(Id, artist, song)
         url = 'http://lrcct2.ttplayer.com/dll/lyricsvr.dll?dl?Id=%d&Code=%d&uid=01&mac=%012x' %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
         f = urllib.urlopen(url)
         Page = f.read()
