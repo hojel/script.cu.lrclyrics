@@ -108,7 +108,8 @@ class ttpClient(object):
 
 class LyricsFetcher:
     def __init__( self ):
-        self.base_url = "http://lrcct2.ttplayer.com/"
+        self.LIST_URL = 'http://ttlrccnc.qianqian.com/dll/lyricsvr.dll?sh?Artist=%s&Title=%s&Flags=0'
+        self.LYRIC_URL = 'http://ttlrccnc.qianqian.com/dll/lyricsvr.dll?dl?Id=%d&Code=%d&uid=01&mac=%012x'
 
     def get_lyrics(self, artist, song):
         log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
@@ -130,7 +131,7 @@ class LyricsFetcher:
         artist = artist.strip().replace('`','').replace('/','')
 
         try:
-            url = 'http://lrcct2.ttplayer.com/dll/lyricsvr.dll?sh?Artist=%s&Title=%s&Flags=0' %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(song.replace(' ','').lower()))
+            url = self.LIST_URL %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(song.replace(' ','').lower()))
             f = urllib.urlopen(url)
             Page = f.read()
         except:
@@ -159,7 +160,7 @@ class LyricsFetcher:
     def get_lyrics_from_list(self, link):
         title,Id,artist,song = link
         log('%s %s %s' %(Id, artist, song))
-        url = 'http://lrcct2.ttplayer.com/dll/lyricsvr.dll?dl?Id=%d&Code=%d&uid=01&mac=%012x' %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
+        url = self.LYRIC_URL %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
         f = urllib.urlopen(url)
         Page = f.read()
         return Page
