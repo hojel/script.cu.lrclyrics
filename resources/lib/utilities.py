@@ -37,6 +37,7 @@ def get_settings():
     settings[ "read_filename_format" ] = __addon__.getSetting( "read_filename_format" )
     settings[ "read_subfolder" ] = __addon__.getSetting( "read_subfolder" ) == "true"
     settings[ "read_subfolder_path" ] = __addon__.getSetting( "read_subfolder_path" )
+    settings[ "auto_download" ] = __addon__.getSetting( "auto_download" ) == "true"
     return settings
 
 def get_textfile(filepath):

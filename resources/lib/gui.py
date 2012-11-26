@@ -119,6 +119,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         self.show_lyrics( lyrics, True )
                     elif ( isinstance( lyrics, list ) and lyrics ):
                         self.show_choices( lyrics )
+                        if ( self.settings[ "auto_download" ] ):
+                            self.get_lyrics_from_list( 0 )
+                        else:
+                            self.show_control( 120 )
                     return
 
         # search embedded txt lyrics
@@ -240,7 +244,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.getControl( 120 ).addItem( song[ 0 ] )
         self.getControl( 120 ).selectItem( 0 )
         self.menu_items = choices
-        self.show_control( 120 )
 
     def reshow_choices( self ):
         if self.menu_items:
@@ -251,8 +254,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 pass
             self.lock.release()
             self.show_control( 120 )
-            
-        
+
     def reset_controls( self ):
         self.getControl( 100 ).reset()
         self.getControl( 110 ).reset()
