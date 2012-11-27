@@ -9,6 +9,7 @@ from utilities import *
 from embedlrc import *
 
 __addon__     = sys.modules[ "__main__" ].__addon__
+__profile__   = sys.modules[ "__main__" ].__profile__
 __language__  = sys.modules[ "__main__" ].__language__
 
 class GUI( xbmcgui.WindowXMLDialog ):
@@ -193,11 +194,22 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.song_path = base_file + '.lrc'
             else:
                 self.song_path = base_file + '.txt'
-            lyrics_file = xbmcvfs.File( self.song_path, "w" )
             if not isinstance (lyrics,str):
                 lyrics = lyrics.encode('utf-8')
-            lyrics_file.write( lyrics )
-            lyrics_file.close()
+
+# xbmcvfs.File().write() corrupts files
+# disable it until the bug is fixed
+# http://trac.xbmc.org/ticket/13545
+#            lyrics_file = xbmcvfs.File( self.song_path, "w" )
+#            lyrics_file.write( lyrics )
+#            lyrics_file.close()
+
+            tmp_name = os.path.join(__profile__.encode("utf-8"), 'lyrics.tmp')
+            tmp_file = open(tmp_name , "w" )
+            tmp_file.write( lyrics )
+            tmp_file.close()
+            xbmcvfs.copy(tmp_name, self.song_path)
+            xbmcvfs.delete(tmp_name)
             return True
         except:
             log( "failed to save lyrics" )
