@@ -72,7 +72,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
     def show_control( self, controlId ):
         self.getControl( 100 ).setVisible( controlId == 100 )
         self.getControl( 110 ).setVisible( controlId == 110 )
-        self.getControl( 120 ).setVisible( controlId == 120 )
         xbmc.sleep( 5 )
         if controlId == 110:
             try:
@@ -84,8 +83,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.setFocus( self.getControl( 605 ) )
             except:
                 pass
-        else:
-                self.setFocus( self.getControl( controlId ) )
 
     def find_lyrics(self, artist, song):
         self.reset_controls()
@@ -116,14 +113,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 if ( lyrics ):
                     log('found lrc lyrics online')
                     self.source = self.scraper[2]
-                    if ( isinstance( lyrics, basestring ) ):
-                        self.show_lyrics( lyrics, True )
-                    elif ( isinstance( lyrics, list ) and lyrics ):
-                        self.show_choices( lyrics )
-                        if ( self.settings[ "auto_download" ] ):
-                            self.get_lyrics_from_list( 0 )
-                        else:
-                            self.show_control( 120 )
+                    self.show_lyrics( lyrics, True )
                     return
 
         # search embedded txt lyrics
@@ -251,26 +241,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self.pOverlay.append( (time, x) )
         self.pOverlay.sort( cmp=lambda x,y: cmp(x[0], y[0]) )
 
-    def show_choices( self, choices ):
-        for song in choices:
-            self.getControl( 120 ).addItem( song[ 0 ] )
-        self.getControl( 120 ).selectItem( 0 )
-        self.menu_items = choices
-
-    def reshow_choices( self ):
-        if self.menu_items:
-            self.lock.acquire()
-            try:
-                self.timer.cancel()
-            except:
-                pass
-            self.lock.release()
-            self.show_control( 120 )
-
     def reset_controls( self ):
         self.getControl( 100 ).reset()
         self.getControl( 110 ).reset()
-        self.getControl( 120 ).reset()
         self.getControl( 200 ).setLabel('')
 
     def exit_script( self ):
@@ -283,10 +256,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.lock.release()
         self.close()
 
-    def onClick( self, controlId ):
-        if ( controlId == 120 ):
-            self.get_lyrics_from_list( self.getControl( 120 ).getSelectedPosition() )
-
     def onFocus( self, controlId ):
         self.controlId = controlId
 
@@ -294,8 +263,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         actionId = action.getId()
         if ( actionId in CANCEL_DIALOG ):
             self.exit_script()
-        elif ( actionId == 101 ) or ( actionId == 117 ): # ACTION_MOUSE_RIGHT_CLICK / ACTION_CONTEXT_MENU
-            self.reshow_choices()
 
     def get_artist_from_filename( self, filename ):
         try:
