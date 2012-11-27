@@ -82,6 +82,12 @@ class LyricsFetcher:
         try:
             response = opener.open(req).read()
         except:
+            log( "%s: %s::%s (%d) [%s]" % (
+                   __title__, self.__class__.__name__,
+                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                   sys.exc_info()[ 2 ].tb_lineno,
+                   sys.exc_info()[ 1 ]
+                   ))
             return None
 
         lrcList = self.miniLyricsParser(response)
