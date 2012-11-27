@@ -7,13 +7,13 @@
 		<setting type="sep" />
 		<setting label="30154" type="lsep"/>
 		<setting id="ttplayer" type="bool" label="TTPlayer" default="true"/>
-		<setting id="minilyrics" type="bool" label="MiniLyrics" default="false"/>
+		<setting id="minilyrics" type="bool" label="MiniLyrics" default="true"/>
 		<setting id="lyrdb" type="bool" label="Lyrdb" default="false"/>
 		<setting type="sep" />
 		<setting label="30155" type="lsep"/>
 		<setting id="lyricwiki" type="bool" label="LyricWiki" default="true"/>
-		<setting id="lyricsmode" type="bool" label="Lyrics Mode" default="false"/>
-		<setting id="lyricstime" type="bool" label="Lyrics Time" default="false"/>
+		<setting id="lyricsmode" type="bool" label="Lyrics Mode" default="true"/>
+		<setting id="lyricstime" type="bool" label="Lyrics Time" default="true"/>
 	</category>
 	<category label="30151">
 		<setting id="read_filename" type="bool" label="30106" default="false"/>
