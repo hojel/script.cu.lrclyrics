@@ -9,6 +9,7 @@ import urllib
 import urllib2
 import socket
 import re
+import difflib
 from hashlib import md5
 import chardet
 from utilities import *
@@ -91,32 +92,23 @@ class LyricsFetcher:
             return None
 
         lrcList = self.miniLyricsParser(response)
-        links = []
         for x in lrcList:
-            links.append( ( x[0] + ' - ' + x[1], x[2], x[0], x[1] ) )
-        if len(links) == 0:
-            return None
-        elif len(links) == 1:
-            lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics
-        else:
-            return links
-
-    def get_lyrics_from_list(self, link):
-        title,url,artist,song = link
-        try:
-            f = urllib.urlopen(url)
-            lyrics = f.read()
-        except:
-            log( "%s: %s::%s (%d) [%s]" % (
-                   __title__, self.__class__.__name__,
-                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
-                   sys.exc_info()[ 2 ].tb_lineno,
-                   sys.exc_info()[ 1 ]
-                   ))
-            return None
-        enc = chardet.detect(lyrics)
-        if (enc['encoding'] == 'utf-8'):
-            return lyrics
-        else:
-            return unicode( lyrics, enc['encoding'] ).encode( "utf-8")
+            # use fuzzy match to find an 'exact' match in the results
+            if (difflib.SequenceMatcher(None, artist.lower(), x[0].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.lower(), x[1].lower()).ratio() > 0.8):
+                try:
+                    f = urllib.urlopen(x[2])
+                    lyrics = f.read()
+                except:
+                    log( "%s: %s::%s (%d) [%s]" % (
+                           __title__, self.__class__.__name__,
+                           sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                           sys.exc_info()[ 2 ].tb_lineno,
+                           sys.exc_info()[ 1 ]
+                           ))
+                    return None
+                enc = chardet.detect(lyrics)
+                if (enc['encoding'] == 'utf-8'):
+                    return lyrics
+                else:
+                    return unicode( lyrics, enc['encoding'] ).encode( "utf-8")
+        return None

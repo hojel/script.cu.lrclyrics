@@ -10,6 +10,7 @@ import socket
 import urllib
 import re
 import random
+import difflib
 from utilities import *
 
 __title__ = "ttplayer.com"
@@ -148,31 +149,20 @@ class LyricsFetcher:
 
         links_query = re.compile('<lrc id=\"(.*?)\" artist=\"(.*?)\" title=\"(.*?)\"></lrc>')
         urls = re.findall(links_query, Page)
-        links = []
         for x in urls:
-            links.append( ( x[1] + ' - ' + x[2], x[0], x[1], x[2] ) )
-        if len(links) == 0:
-            lyrics = None
-            return lyrics
-        elif len(links) == 1:
-            lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics
-        else:
-            return links
-
-    def get_lyrics_from_list(self, link):
-        title,Id,artist,song = link
-        log('%s %s %s' %(Id, artist, song))
-        try:
-            url = self.LYRIC_URL %(int(Id),ttpClient.CodeFunc(int(Id), artist + song), random.randint(0,0xFFFFFFFFFFFF))
-            f = urllib.urlopen(url)
-            Page = f.read()
-        except:
-            log( "%s: %s::%s (%d) [%s]" % (
-                   __title__, self.__class__.__name__,
-                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
-                   sys.exc_info()[ 2 ].tb_lineno,
-                   sys.exc_info()[ 1 ]
-                   ))
-            return None
-        return Page
+            # use fuzzy match to find an 'exact' match in the results
+            if (difflib.SequenceMatcher(None, artist.lower(), x[1].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.lower(), x[2].lower()).ratio() > 0.8):
+                try:
+                    url = self.LYRIC_URL %(int(x[0]),ttpClient.CodeFunc(int(x[0]), x[1] + x[2]), random.randint(0,0xFFFFFFFFFFFF))
+                    f = urllib.urlopen(url)
+                    lyrics = f.read()
+                except:
+                    log( "%s: %s::%s (%d) [%s]" % (
+                           __title__, self.__class__.__name__,
+                           sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                           sys.exc_info()[ 2 ].tb_lineno,
+                           sys.exc_info()[ 1 ]
+                           ))
+                    return None
+                return lyrics
+        return None
