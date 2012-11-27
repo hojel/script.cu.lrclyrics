@@ -36,8 +36,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.lock = thread.allocate_lock()
         self.timer = None
         self.allowtimer = True
-        self.artist = None
-        self.song = None
+        self.songfile = None
         self.controlId = -1
         self.pOverlay = []
         self.scrapers = []
@@ -297,22 +296,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.exit_script()
         else:
             for cnt in range( 5 ):
-                song = ''
-                artist = ''
                 songfile = ''
                 try:
                     song = xbmc.Player().getMusicInfoTag().getTitle()
                     artist = xbmc.Player().getMusicInfoTag().getArtist()
                     log("Artist: %s - Song: %s" % (artist, song))
-
                     songfile = xbmc.getInfoLabel('Player.Filenameandpath')
                 except:
                     pass
-                if ( song and ( not artist or self.settings[ "read_filename" ] ) ):
+                if ( songfile and ( ( not song) or (not artist) or self.settings[ "read_filename" ] ) ):
                     artist, song = self.get_artist_from_filename( songfile )
-                if ( song and ( self.song != song or self.artist != artist ) ):
-                    self.artist = artist
-                    self.song = song
+                if ( songfile and ( self.songfile != songfile  ) ):
+                    self.songfile = songfile
                     self.lock.acquire()
                     try:
                         self.timer.cancel()
