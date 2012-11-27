@@ -11,6 +11,8 @@ __title__ = 'lyricwiki'
 __priority__ = '200'
 __lrc__ = False
 
+LIC_TXT = 'we are not licensed to display the full lyrics for this song at the moment'
+
 socket.setdefaulttimeout(10)
 
 class LyricsFetcher:
@@ -47,6 +49,8 @@ class LyricsFetcher:
                 htmlparser = HTMLParser.HTMLParser()
                 lyricstext = htmlparser.unescape(lyricscode).replace('<br />', '\n')
                 lyrics = re.sub('<[^<]+?>', '', lyricstext)
+                if LIC_TXT in lyrics:
+                    return None
                 return lyrics
             except:
                 return None
