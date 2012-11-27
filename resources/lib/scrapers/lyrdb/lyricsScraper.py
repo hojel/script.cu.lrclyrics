@@ -16,7 +16,7 @@ __title__ = "lyrdb.com"
 __priority__ = '120'
 __lrc__ = True
 
-socket.setdefaulttimeout(10)
+socket.setdefaulttimeout(30)
 
 class LyricsFetcher:
     def __init__( self ):
