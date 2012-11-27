@@ -171,6 +171,14 @@
 				<overlaytexture>-</overlaytexture>
 				<overlaytexture>-</overlaytexture>
 			</control>
+			<control type="slider">
+				<description>Slider</description>
+				<posx>254</posx>
+				<posy>141</posy>
+				<width>516</width>
+				<height>12</height>
+				<action>seek</action>
+			</control>
 			<control type="image">
 				<description>separator</description>
 				<posx>14</posx>
