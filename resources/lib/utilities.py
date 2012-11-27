@@ -1,6 +1,7 @@
 import sys
 import os
 import chardet
+import unicodedata
 import xbmc, xbmcvfs
 
 __addon__     = sys.modules[ "__main__" ].__addon__
@@ -22,6 +23,9 @@ def log(txt):
         txt = txt.decode("utf-8")
     message = u'%s: %s' % (__addonname__, txt)
     xbmc.log(msg=message.encode("utf-8"), level=xbmc.LOGDEBUG)
+
+def deAccent(str):
+    return unicodedata.normalize('NFKD', unicode(unicode(str, 'utf-8'))).encode('ascii','ignore')
 
 def get_settings():
     settings = {}

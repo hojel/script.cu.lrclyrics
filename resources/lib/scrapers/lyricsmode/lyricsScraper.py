@@ -18,8 +18,10 @@ class LyricsFetcher:
 
     def get_lyrics(self, artist, song):
         log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
+        artist = deAccent(artist)
+        song = deAccent(song)
         try: # below is borowed from XBMC Lyrics
-            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace(" ","_"), song.lower().replace(" ","_"))
+            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace("&","and").replace(" ","_"), song.lower().replace("&","and").replace(" ","_"))
             lyrics_found = False
             while True:
                 log( "%s: search url: %s" % (__title__, url))
