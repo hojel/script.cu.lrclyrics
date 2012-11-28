@@ -1,5 +1,3 @@
-# credits: EnderW, Nuka1195, Taxigps, amet, ronie, yannrouillard
-
 # main import's 
 import sys
 import os
