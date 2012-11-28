@@ -151,8 +151,7 @@ class LyricsFetcher:
         urls = re.findall(links_query, Page)
         links = []
         for x in urls:
-            if (difflib.SequenceMatcher(None, artist.lower(), x[1].lower()).ratio() > 0.8)
-                  and (difflib.SequenceMatcher(None, song.lower(), x[2].lower()).ratio() > 0.8):
+            if (difflib.SequenceMatcher(None, artist.lower(), x[1].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.lower(), x[2].lower()).ratio() > 0.8):
                 links.append( ( x[1] + ' - ' + x[2], x[0], x[1], x[2] ) )
         if len(links) == 0:
             lyrics = None
