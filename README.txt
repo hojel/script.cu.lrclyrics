@@ -20,7 +20,7 @@ depending on which options you've enabled, the script searches for lyrics in thi
 - embedded text lyrics
 - text lyrics file
 - lyricwiki scraper
-- lyricsmood scraper
+- lyricsmode scraper
 - lyricstime scraper
 
 
