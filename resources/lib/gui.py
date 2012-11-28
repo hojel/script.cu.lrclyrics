@@ -122,6 +122,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         if ( self.settings[ "auto_download" ] ):
                             self.get_lyrics_from_list( 0 )
                         else:
+                            self.getControl( 200 ).setLabel( self.source )
                             self.show_control( 120 )
                     return
 
