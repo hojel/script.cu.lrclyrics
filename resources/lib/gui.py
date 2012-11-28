@@ -157,7 +157,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def get_lyrics_from_list( self, item ):
         lyrics = self.scraper[1].get_lyrics_from_list( self.menu_items[ item ] )
-        self.getControl( 110 ).reset()        
+        self.getControl( 110 ).reset()
         self.show_lyrics( lyrics, True )
 
     def get_lyrics_from_file( self, artist, song, getlrc ):
@@ -337,9 +337,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     songfile = xbmc.getInfoLabel('Player.Filenameandpath')
                 except:
                     pass
-                if ( songfile and ( ( not song) or (not artist) or self.settings[ "read_filename" ] ) ):
+                if ( songfile and ( (not song) or (not artist) or self.settings[ "read_filename" ] ) ):
                     artist, song = self.get_artist_from_filename( songfile )
-                if ( songfile and ( self.songfile != songfile  ) ):
+                if ( songfile and ( self.songfile != songfile ) ):
                     self.songfile = songfile
                     self.lock.acquire()
                     try:
