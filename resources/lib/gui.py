@@ -357,7 +357,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 except:
                     pass
                 self.lock.release()
-                self.refresh()
+                if self.lrc:
+                    self.refresh()
 
 class MyPlayer( xbmc.Player ):
     """ Player Class: calls function when song changes or playback ends """
