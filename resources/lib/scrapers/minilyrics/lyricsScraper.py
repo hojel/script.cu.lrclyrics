@@ -11,6 +11,7 @@ import socket
 import re
 from hashlib import md5
 import chardet
+import difflib
 from utilities import *
 
 __title__ = "MiniLyrics"
@@ -93,7 +94,9 @@ class LyricsFetcher:
         lrcList = self.miniLyricsParser(response)
         links = []
         for x in lrcList:
-            links.append( ( x[0] + ' - ' + x[1], x[2], x[0], x[1] ) )
+            if (difflib.SequenceMatcher(None, artist.lower(), x[0].lower()).ratio() > 0.8)
+                  and (difflib.SequenceMatcher(None, song.lower(), x[1].lower()).ratio() > 0.8):
+                links.append( ( x[0] + ' - ' + x[1], x[2], x[0], x[1] ) )
         if len(links) == 0:
             return None
         elif len(links) == 1:
