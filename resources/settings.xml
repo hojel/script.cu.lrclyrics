@@ -6,8 +6,8 @@
 		<setting id="search_file" type="bool" label="30153" default="true"/>
 		<setting type="sep" />
 		<setting label="30154" type="lsep"/>
-		<setting id="ttplayer" type="bool" label="TTPlayer" default="true"/>
 		<setting id="minilyrics" type="bool" label="MiniLyrics" default="true"/>
+		<setting id="ttplayer" type="bool" label="TTPlayer" default="true"/>
 		<setting id="lyrdb" type="bool" label="Lyrdb" default="false"/>
 		<setting type="sep" />
 		<setting label="30155" type="lsep"/>
