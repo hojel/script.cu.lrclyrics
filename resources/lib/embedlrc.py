@@ -13,7 +13,7 @@ def getEmbedLyrics(filename):
     if lyrics:
         enc = chardet.detect(lyrics)
         return lyrics.decode(enc['encoding'])
-    else:        
+    else:
         return getID3Lyrics(filename)
 
 """
