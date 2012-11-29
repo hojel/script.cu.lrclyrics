@@ -49,6 +49,7 @@
 				<posx>350</posx>
 				<posy>44</posy>
 				<width>180</width>
+				<height>20</height>
 				<label>[B]$LOCALIZE[SCRIPT0][/B]</label>
 				<font>font13</font>
 				<align>center</align>
@@ -69,6 +70,7 @@
 				<posx>846</posx>
 				<posy>34</posy>
 				<width>300</width>
+				<height>20</height>
 				<posx>600</posx>
 				<label>-</label>
 				<font>font13</font>
@@ -81,6 +83,7 @@
 				<posx>184</posx>
 				<posy>75</posy>
 				<width>662</width>
+				<height>20</height>
 				<label>[B]$INFO[MusicPlayer.Artist][/B]</label>
 				<font>font13</font>
 				<align>left</align>
@@ -91,6 +94,7 @@
 				<posx>184</posx>
 				<posy>95</posy>
 				<width>540</width>
+				<height>20</height>
 				<label>[B]$INFO[MusicPlayer.Title][/B]</label>
 				<font>font13</font>
 				<align>left</align>
@@ -101,6 +105,7 @@
 				<posx>184</posx>
 				<posy>115</posy>
 				<width>540</width>
+				<height>20</height>
 				<label>[B]$INFO[MusicPlayer.Album][/B]</label>
 				<font>font13</font>
 				<align>left</align>
@@ -120,19 +125,23 @@
 				<posx>184</posx>
 				<posy>135</posy>
 				<width>200</width>
+				<height>20</height>
 				<label>$INFO[MusicPlayer.Time]</label>
 				<font>font13</font>
 				<align>left</align>
+				<aligny>center</aligny>
 				<textcolor>FFFFFFFF</textcolor>
 			</control>
 			<control type="label">
 				<description>Duration Label</description>
 				<posx>846</posx>
-				<posy>134</posy>
+				<posy>135</posy>
 				<width>200</width>
+				<height>20</height>
 				<label>$INFO[MusicPlayer.Duration]</label>
 				<font>font13</font>
 				<align>right</align>
+				<aligny>center</aligny>
 				<textcolor>FFFFFFFF</textcolor>
 			</control>
 			<control type="label">
@@ -140,6 +149,7 @@
 				<posx>846</posx>
 				<posy>114</posy>
 				<width>200</width>
+				<height>20</height>
 				<label>$INFO[MusicPlayer.Playlistposition]$INFO[MusicPlayer.Playlistlength,/]</label>
 				<font>font13</font>
 				<align>right</align>
@@ -151,6 +161,7 @@
 				<posx>846</posx>
 				<posy>114</posy>
 				<width>200</width>
+				<height>20</height>
 				<label>589</label>
 				<font>font13</font>
 				<align>right</align>
@@ -160,7 +171,7 @@
 			<control type="progress">
 				<description>Progressbar</description>
 				<posx>254</posx>
-				<posy>141</posy>
+				<posy>139</posy>
 				<width>516</width>
 				<height>12</height>
 				<info>Player.Progress</info>
@@ -174,7 +185,7 @@
 			<control type="slider">
 				<description>Slider</description>
 				<posx>254</posx>
-				<posy>141</posy>
+				<posy>139</posy>
 				<width>516</width>
 				<height>12</height>
 				<action>seek</action>
