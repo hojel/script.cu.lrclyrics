@@ -13,7 +13,7 @@ import difflib
 from utilities import *
 
 __title__ = "Lyrdb"
-__priority__ = '120'
+__priority__ = '150'
 __lrc__ = True
 
 socket.setdefaulttimeout(30)
