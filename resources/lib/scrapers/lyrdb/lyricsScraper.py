@@ -12,7 +12,7 @@ import re
 import difflib
 from utilities import *
 
-__title__ = "lyrdb.com"
+__title__ = "Lyrdb"
 __priority__ = '120'
 __lrc__ = True
 

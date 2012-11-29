@@ -13,7 +13,7 @@ import random
 import difflib
 from utilities import *
 
-__title__ = "ttplayer.com"
+__title__ = "TTPlayer"
 __priority__ = '110'
 __lrc__ = True
 
