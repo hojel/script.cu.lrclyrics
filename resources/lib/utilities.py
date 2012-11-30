@@ -12,12 +12,6 @@ __cwd__       = sys.modules[ "__main__" ].__cwd__
 CANCEL_DIALOG = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
 LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "scrapers")
 
-def _create_base_paths():
-    """ creates the base folders """
-    if ( not xbmcvfs.exists( __profile__.encode("utf-8") ) ):
-        xbmcvfs.mkdirs( __profile__.encode("utf-8") )
-_create_base_paths()
-
 def log(txt):
     if isinstance (txt,str):
         txt = txt.decode("utf-8")
