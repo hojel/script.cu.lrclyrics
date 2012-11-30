@@ -21,23 +21,6 @@ def log(txt):
 def deAccent(str):
     return unicodedata.normalize('NFKD', unicode(unicode(str, 'utf-8'))).encode('ascii','ignore')
 
-def get_settings():
-    settings = {}
-    settings[ "search_embedded" ] = __addon__.getSetting( "search_embedded" ) == "true"
-    settings[ "search_file" ] = __addon__.getSetting( "search_file" ) == "true"
-    settings[ "save_lyrics" ] = __addon__.getSetting( "save_lyrics" ) == "true"
-    settings[ "save_lyrics_path" ] = __addon__.getSetting( "save_lyrics_path" )
-    if ( settings[ "save_lyrics_path" ] == "" ):
-        settings[ "save_lyrics_path" ] = os.path.join( __profile__.encode("utf-8"), "lyrics" )
-        __addon__.setSetting(id="save_lyrics_path", value=settings[ "save_lyrics_path" ])
-    settings[ "save_artist_folder" ] = __addon__.getSetting( "save_artist_folder" ) == "true"
-    settings[ "read_filename" ] = __addon__.getSetting( "read_filename" ) == "true"
-    settings[ "read_filename_format" ] = __addon__.getSetting( "read_filename_format" )
-    settings[ "read_subfolder" ] = __addon__.getSetting( "read_subfolder" ) == "true"
-    settings[ "read_subfolder_path" ] = __addon__.getSetting( "read_subfolder_path" )
-    settings[ "auto_download" ] = __addon__.getSetting( "auto_download" ) == "true"
-    return settings
-
 def get_textfile(filepath):
     try:
         file = xbmcvfs.File( filepath )

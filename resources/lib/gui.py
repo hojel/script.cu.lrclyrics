@@ -21,9 +21,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def setup_all( self ):
         self.setup_variables()
-        self.settings = get_settings()
         self.get_scraper_list()
         self.getMyPlayer()
+        if ( __addon__.getSetting( "save_lyrics_path" ) == "" ):
+            __addon__.setSetting(id="save_lyrics_path", value=os.path.join( __profile__.encode("utf-8"), "lyrics" ))
 
     def get_scraper_list( self ):
         for scraper in os.listdir(LYRIC_SCRAPER_DIR):
@@ -94,7 +95,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         xbmc.sleep( 60 )
         # search embedded lrc lyrics
         self.lrc = True
-        if ( self.settings[ "search_embedded" ] ):
+        if ( __addon__.getSetting( "search_embedded" ) == "true" ):
             lyrics = getEmbedLyrics(xbmc.getInfoLabel('Player.Filenameandpath').decode("utf-8"))
             if ( lyrics ):
                 log('found embedded lrc lyrics')
@@ -102,7 +103,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.show_lyrics( lyrics )
                 return
         # search lrc lyrics in file
-        if ( self.settings[ "search_file" ] ):
+        if ( __addon__.getSetting( "search_file" ) == "true" ):
             lyrics = self.get_lyrics_from_file(artist, song, True)
             if ( lyrics ):
                 log('found lrc lyrics from file')
@@ -120,7 +121,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         self.show_lyrics( lyrics, True )
                     elif ( isinstance( lyrics, list ) and lyrics ):
                         self.show_choices( lyrics )
-                        if ( self.settings[ "auto_download" ] ):
+                        if ( __addon__.getSetting( "auto_download" ) == "true" ):
                             self.get_lyrics_from_list( 0 )
                         else:
                             self.getControl( 200 ).setLabel( self.source )
@@ -129,7 +130,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
         # search embedded txt lyrics
         self.lrc = False
-        if ( self.settings[ "search_embedded" ] ):
+        if ( __addon__.getSetting( "search_embedded" ) == "true" ):
             lyrics = xbmc.getInfoLabel( "MusicPlayer.Lyrics" )
             if lyrics:
                 log('found embedded txt lyrics')
@@ -137,7 +138,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 self.show_lyrics( lyrics )
                 return
         # search txt lyrics in file
-        if ( self.settings[ "search_file" ] ):
+        if ( __addon__.getSetting( "search_file" ) == "true" ):
             lyrics = self.get_lyrics_from_file(artist, song, False)
             if ( lyrics ):
                 log('found txt lyrics from file')
@@ -171,16 +172,16 @@ class GUI( xbmcgui.WindowXMLDialog ):
         dirname = os.path.dirname(path)
         basename = os.path.basename(path)
         filename = basename.rsplit( ".", 1 )[ 0 ]
-        if ( self.settings[ "read_subfolder" ] ):
-            self.song_path = unicode( os.path.join( dirname, self.settings[ "read_subfolder_path" ], filename + ext ), "utf-8" )
+        if ( __addon__.getSetting( "read_subfolder" ) == "true" ):
+            self.song_path = unicode( os.path.join( dirname, __addon__.getSetting( "read_subfolder_path" ), filename + ext ), "utf-8" )
         else:
             self.song_path = unicode( os.path.join( dirname, filename + ext ), "utf-8" )
         if xbmcvfs.exists(self.song_path):
             return get_textfile( self.song_path )
-        if ( self.settings[ "save_artist_folder" ] ):
-            self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + ext ), "utf-8" )
+        if ( __addon__.getSetting( "save_artist_folder" ) == "true" ):
+            self.song_path = unicode( os.path.join( __addon__.getSetting( "save_lyrics_path" ), artist.replace( "\\", "_" ).replace( "/", "_" ), song.replace( "\\", "_" ).replace( "/", "_" ) + ext ), "utf-8" )
         else:
-            self.song_path = unicode( os.path.join( self.settings[ "save_lyrics_path" ], artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + ext ), "utf-8" )
+            self.song_path = unicode( os.path.join( __addon__.getSetting( "save_lyrics_path" ), artist.replace( "\\", "_" ).replace( "/", "_" ) + " - " + song.replace( "\\", "_" ).replace( "/", "_" ) + ext ), "utf-8" )
         if xbmcvfs.exists(self.song_path):
             return get_textfile( self.song_path )
         else:
@@ -228,7 +229,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                self.getControl( 110 ).addItem( x )
         self.getControl( 110 ).selectItem( 0 )
         self.show_control( 110 )
-        if ( self.settings[ "save_lyrics" ] and save ):
+        if ( (__addon__.getSetting( "save_lyrics" ) == "true") and save ):
             success = self.save_lyrics_to_file( lyrics )
         if self.lrc:
             if (self.allowtimer and self.getControl( 110 ).size() > 1):
@@ -304,17 +305,17 @@ class GUI( xbmcgui.WindowXMLDialog ):
             song = filename
             basename = os.path.basename( filename )
             # Artist - Song.ext
-            if ( self.settings[ "read_filename_format" ] == "0" ):
+            if ( __addon__.getSetting( "read_filename_format" ) == "0" ):
                 artist = basename.split( "-", 1 )[ 0 ].strip()
                 song = os.path.splitext( basename.split( "-", 1 )[ 1 ].strip() )[ 0 ]
             # Artist/Album/Song.ext or Artist/Album/Track Song.ext
-            elif ( self.settings[ "read_filename_format" ] in ( "1", "2", ) ):
+            elif ( __addon__.getSetting( "read_filename_format" ) in ( "1", "2", ) ):
                 artist = os.path.basename( os.path.split( os.path.split( filename )[ 0 ] )[ 0 ] )
                 # Artist/Album/Song.ext
-                if ( self.settings[ "read_filename_format" ] == "1" ):
+                if ( __addon__.getSetting( "read_filename_format" ) == "1" ):
                     song = os.path.splitext( basename )[ 0 ]
                 # Artist/Album/Track Song.ext
-                elif ( self.settings[ "read_filename_format" ] == "2" ):
+                elif ( __addon__.getSetting( "read_filename_format" ) == "2" ):
                     song = os.path.splitext( basename )[ 0 ].split( " ", 1 )[ 1 ]
         except:
             # invalid format selected
@@ -339,7 +340,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     songfile = xbmc.getInfoLabel('Player.Filenameandpath')
                 except:
                     pass
-                if ( songfile and ( (not song) or (not artist) or self.settings[ "read_filename" ] ) ):
+                if ( songfile and ( (not song) or (not artist) or (__addon__.getSetting( "read_filename" ) == "true") ) ):
                     artist, song = self.get_artist_from_filename( songfile )
                 if ( songfile and ( self.songfile != songfile ) ):
                     self.songfile = songfile
