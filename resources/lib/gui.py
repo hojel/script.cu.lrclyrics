@@ -206,7 +206,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 #            lyrics_file.write( lyrics )
 #            lyrics_file.close()
 
-            tmp_name = os.path.join(__profile__.encode("utf-8"), 'lyrics.tmp')
+            tmp_name = os.path.join(__profile__, u'lyrics.tmp')
             tmp_file = open(tmp_name , "w" )
             tmp_file.write( lyrics )
             tmp_file.close()
