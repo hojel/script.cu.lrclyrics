@@ -357,7 +357,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         except:
                             pass
                         self.prepare_list(lyrics)
-                        #TODO show icon in skin to indicate multiple lyrics are available
                     else:
                         try:
                             self.getControl( 299 ).setVisible(False)
