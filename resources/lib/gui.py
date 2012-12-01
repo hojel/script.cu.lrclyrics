@@ -232,6 +232,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
     def show_error(self):
         self.getControl( 100 ).setText( __language__( 30001 ) )
         self.show_control( 100 )
+        self.getControl( 200 ).setLabel('')
 
     def show_lyrics( self, lyrics, save=False ):
         self.reset_controls()
