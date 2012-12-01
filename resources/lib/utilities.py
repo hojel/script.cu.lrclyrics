@@ -146,11 +146,14 @@ class Song:
         song = Song()
         if offset > 0:
             offset_str = ".offset(%i)" % offset
-            pos = int(xbmc.getInfoLabel('MusicPlayer.PlaylistPosition')) + offset
-            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Playlist.GetItems", "params": {"properties": ["file"], "playlistid": 0, "limits": {"start": %i, "end": %i} }, "id": 1}' % (pos, pos))
-            json_query = unicode(json_query, 'utf-8', errors='ignore')
-            json_response = simplejson.loads(json_query)
-            song.filepath = json_response['result']['items'][0]['file'].encode('utf-8')
+            try:
+                pos = int(xbmc.getInfoLabel('MusicPlayer.PlaylistPosition')) + offset
+                json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Playlist.GetItems", "params": {"properties": ["file"], "playlistid": 0, "limits": {"start": %i, "end": %i} }, "id": 1}' % (pos-1, pos))
+                json_query = unicode(json_query, 'utf-8', errors='ignore')
+                json_response = simplejson.loads(json_query)
+                song.filepath = json_response['result']['items'][0]['file'].encode('utf-8')
+            except:
+                song.filepath = ""
         else:
             offset_str = ""
             song.filepath = xbmc.getInfoLabel('Player.Filenameandpath')
