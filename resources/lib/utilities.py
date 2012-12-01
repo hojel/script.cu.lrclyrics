@@ -23,7 +23,7 @@ def log(txt):
     xbmc.log(msg=message.encode("utf-8"), level=xbmc.LOGDEBUG)
 
 def deAccent(str):
-    return unicodedata.normalize('NFKD', unicode(unicode(str, 'utf-8'))).encode('ascii','ignore')
+    return unicodedata.normalize('NFKD', unicode(str, 'utf-8'))
 
 def get_textfile(filepath):
     try:
