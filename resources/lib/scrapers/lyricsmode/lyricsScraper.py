@@ -16,12 +16,17 @@ class LyricsFetcher:
         self.search_results_regex = re.compile("<a href=\"[^\"]+\">([^<]+)</a></td>[^<]+<td><a href=\"([^\"]+)\" class=\"b\">[^<]+</a></td>", re.IGNORECASE)
         self.next_results_regex = re.compile("<A href=\"([^\"]+)\" class=\"pages\">next .</A>", re.IGNORECASE)
 
-    def get_lyrics(self, artist, song):
-        log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
-        artist = deAccent(artist)
-        song = deAccent(song)
+    def get_lyrics(self, song):
+        log( "%s: searching lyrics for %s - %s" % (__title__, song.artist, song.title))
+        lyrics = Lyrics()
+        lyrics.song = song
+        lyrics.source = __title__
+        lyrics.lrc = __lrc__
+
+        artist = deAccent(song.artist)
+        title = deAccent(song.title)
         try: # below is borowed from XBMC Lyrics
-            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace("&","and").replace(" ","_"), song.lower().replace("&","and").replace(" ","_"))
+            url = "http://www.lyricsmode.com/lyrics/%s/%s/%s.html" % (artist.lower()[:1], artist.lower().replace("&","and").replace(" ","_"), title.lower().replace("&","and").replace(" ","_"))
             lyrics_found = False
             while True:
                 log( "%s: search url: %s" % (__title__, url))
@@ -36,7 +41,7 @@ class LyricsFetcher:
 
                 # Let's try to use the research box if we didn't yet
                 if not 'search' in url:
-                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + urllib.quote_plus(song.lower())
+                    url = "http://www.lyricsmode.com/search.php?what=songs&s=" + urllib.quote_plus(title.lower())
                 else:
                     # the search gave more than on result, let's try to find our song
                     url = ""
@@ -67,7 +72,8 @@ class LyricsFetcher:
                 line.strip()
                 if line.find("Lyrics from:") < 0:
                     lir.append(line)
-            lyrics = u"\n".join( lir )
+            lyr = u"\n".join( lir )
+            lyrics.lyrics = lyr
             return lyrics
         except:
             log( "%s: %s::%s (%d) [%s]" % (

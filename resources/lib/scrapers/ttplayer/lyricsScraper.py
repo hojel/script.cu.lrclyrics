@@ -115,27 +115,34 @@ class LyricsFetcher:
         self.LIST_URL = 'http://ttlrccnc.qianqian.com/dll/lyricsvr.dll?sh?Artist=%s&Title=%s&Flags=0'
         self.LYRIC_URL = 'http://ttlrccnc.qianqian.com/dll/lyricsvr.dll?dl?Id=%d&Code=%d&uid=01&mac=%012x'
 
-    def get_lyrics(self, artist, song):
-        log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
+    def get_lyrics(self, song):
+        log( "%s: searching lyrics for %s - %s" % (__title__, song.artist, song.title))
+        lyrics = Lyrics()
+        lyrics.song = song
+        lyrics.source = __title__
+        lyrics.lrc = __lrc__
+
+        artist = song.artist
+        title = song.title
         # replace ampersands and the like
         for exp in LYRIC_ARTIST_REPLACE:
                 p = re.compile(exp[0])
                 artist = p.sub(exp[1], artist)
         for exp in LYRIC_TITLE_REPLACE:
                 p = re.compile(exp[0])
-                song = p.sub(exp[1], song)
+                title = p.sub(exp[1], title)
 
         # strip things like "(live at Somewhere)", "(accoustic)", etc
         for exp in LYRIC_TITLE_STRIP:
             p = re.compile(exp)
-            song = p.sub('', song)
+            title = p.sub('', title)
 
         # compress spaces
-        song = song.strip().replace('`','').replace('/','')
+        title = title.strip().replace('`','').replace('/','')
         artist = artist.strip().replace('`','').replace('/','')
 
         try:
-            url = self.LIST_URL %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(song.replace(' ','').lower()))
+            url = self.LIST_URL %(ttpClient.EncodeArtTit(artist.replace(' ','').lower()), ttpClient.EncodeArtTit(title.replace(' ','').lower()))
             f = urllib.urlopen(url)
             Page = f.read()
         except:
@@ -151,16 +158,17 @@ class LyricsFetcher:
         urls = re.findall(links_query, Page)
         links = []
         for x in urls:
-            if (difflib.SequenceMatcher(None, artist.lower(), x[1].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.lower(), x[2].lower()).ratio() > 0.8):
+            if (difflib.SequenceMatcher(None, artist.lower(), x[1].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, title.lower(), x[2].lower()).ratio() > 0.8):
                 links.append( ( x[1] + ' - ' + x[2], x[0], x[1], x[2] ) )
         if len(links) == 0:
-            lyrics = None
-            return lyrics
-        elif len(links) == 1:
-            lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics
-        else:
-            return links
+            return None
+        elif len(links) > 1:
+            lyrics.list = links
+        lyr = self.get_lyrics_from_list(links[0])
+        if not lyr:
+            return None
+        lyrics.lyrics = lyr
+        return lyrics
 
     def get_lyrics_from_list(self, link):
         title,Id,artist,song = link

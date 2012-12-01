@@ -3,18 +3,31 @@ import re
 import chardet
 from tagger import *
 import xbmcvfs
+from utilities import *
 
-def getEmbedLyrics(filename):
-    lyrics = None
-    try:
-        lyrics = getLyrics3(filename)
-    except:
-        pass
-    if lyrics:
-        enc = chardet.detect(lyrics)
-        return lyrics.decode(enc['encoding'])
+__language__  = sys.modules[ "__main__" ].__language__
+
+def getEmbedLyrics(song, getlrc):
+    lyrics = Lyrics()
+    lyrics.song = song
+    lyrics.source = __language__( 30002 )
+    lyrics.lrc = getlrc
+    filename = song.filepath.decode("utf-8")
+    lry = None
+    if getlrc:
+        try:
+            lry = getLyrics3(filename)
+        except:
+            pass
+    if lry:
+        enc = chardet.detect(lry)
+        lyrics.lyrics = lry.decode(enc['encoding'])
     else:
-        return getID3Lyrics(filename)
+        lry = getID3Lyrics(filename, getlrc)
+        if not lry:
+            return None
+        lyrics.lyrics = lry
+    return lyrics
 
 """
 Get LRC lyrics embed with Lyrics3/Lyrics3V2 format
@@ -72,19 +85,21 @@ def ms2timestamp(ms):
     return timestamp
 
 """
-Get SYLT/TXXX lyrics embed with ID3v2 format
+Get USLT/SYLT/TXXX lyrics embed with ID3v2 format
 See: http://id3.org/id3v2.3.0
 """
-def getID3Lyrics(filename):
+def getID3Lyrics(filename, getlrc):
     id3 = ID3v2(filename)
     if id3.version == 2.2:
         sylt = "SLT"
+        uslt = "ULT"
         txxx = "TXX"
     else:
         sylt = "SYLT"
+        uslt = "USLT"
         txxx = "TXXX"
     for tag in id3.frames:
-        if tag.fid == sylt:
+        if getlrc and tag.fid == sylt:
             enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
             lang = tag.rawdata[1:4]
             format = tag.rawdata[4]
@@ -112,7 +127,7 @@ def getID3Lyrics(filename):
                 lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
                 content = content[pos+5:]
             return lyrics
-        elif tag.fid == txxx:
+        elif getlrc and tag.fid == txxx:
             """
             Frame data in rawdata[]:
             Text encoding     $xx
@@ -131,4 +146,24 @@ def getID3Lyrics(filename):
                 if (enc == 'latin_1'):
                     enc = chardet.detect(lyrics)['encoding']
                 return lyrics.decode(enc)
+        elif (not getlrc) and tag.fid == uslt:
+            """
+            Frame data in rawdata[]:
+            Text encoding        $xx
+            Language             $xx xx xx
+            Content descriptor   <textstring> $00 (00)
+            Lyrics/text          <textstring>
+            """
+            enc = ['latin_1','utf_16','utf_16_be','utf_8'][ord(tag.rawdata[0])]
+            lang = tag.rawdata[1:4]
+            raw = tag.rawdata[4:]
+            utf16 = bool(enc.find('16') != -1)
+            pos = endOfString(raw, utf16)
+            desc = raw[:pos]
+            if utf16:
+                pos += 1
+            lyrics = raw[pos+1:]
+            if (enc == 'latin_1'):
+                enc = chardet.detect(lyrics)['encoding']
+            return lyrics.decode(enc)
     return None

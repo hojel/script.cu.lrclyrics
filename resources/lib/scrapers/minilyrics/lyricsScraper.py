@@ -64,10 +64,15 @@ class LyricsFetcher:
                 ret.append(loc)
         return ret
 
-    def get_lyrics(self, artist, song):
-        log( "%s: searching lyrics for %s - %s" % (__title__, artist, song))
+    def get_lyrics(self, song):
+        log( "%s: searching lyrics for %s - %s" % (__title__, song.artist, song.title))
+        lyrics = Lyrics()
+        lyrics.song = song
+        lyrics.source = __title__
+        lyrics.lrc = __lrc__
+
         xml ="<?xml version=\"1.0\" encoding='utf-8'?>\r\n"
-        xml+="<search filetype=\"lyrics\" artist=\"%s\" title=\"%s\" " % (artist, song)
+        xml+="<search filetype=\"lyrics\" artist=\"%s\" title=\"%s\" " % (song.artist, song.title)
         xml+="ClientCharEncoding=\"utf-8\"/>\r\n"
         md5hash = md5(xml+"Mlv1clt4.0").digest()
         request = "\x02\x00\x04\x00\x00\x00%s%s" % (md5hash, xml)
@@ -94,15 +99,17 @@ class LyricsFetcher:
         lrcList = self.miniLyricsParser(response)
         links = []
         for x in lrcList:
-            if (difflib.SequenceMatcher(None, artist.lower(), x[0].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.lower(), x[1].lower()).ratio() > 0.8):
+            if (difflib.SequenceMatcher(None, song.artist.lower(), x[0].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.title.lower(), x[1].lower()).ratio() > 0.8):
                 links.append( ( x[0] + ' - ' + x[1], x[2], x[0], x[1] ) )
         if len(links) == 0:
             return None
-        elif len(links) == 1:
-            lyrics = self.get_lyrics_from_list(links[0])
-            return lyrics
-        else:
-            return links
+        elif len(links) > 1:
+            lyrics.list = links
+        lyr = self.get_lyrics_from_list(links[0])
+        if not lyr:
+            return None
+        lyrics.lyrics = lyr
+        return lyrics
 
     def get_lyrics_from_list(self, link):
         title,url,artist,song = link
