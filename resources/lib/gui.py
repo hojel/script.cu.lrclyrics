@@ -46,6 +46,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.nextlrc = False
         self.nextsave = False
         self.nextsource = None
+        self.refreshing = False
         self.controlId = -1
         self.pOverlay = []
         self.scrapers = []
@@ -72,7 +73,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if (self.allowtimer and cur_time < self.pOverlay[nums - 1][0]):
                 waittime = self.pOverlay[pos + 1][0] - cur_time
                 self.timer = Timer(waittime, self.refresh)
+                self.refreshing = True
                 self.timer.start()
+            else:
+                self.refreshing = False
             self.lock.release()
         except:
             self.lock.release()
@@ -388,7 +392,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 if song and artist:
                     log("prefetch - Artist: %s - Song: %s" % (artist, song))
                     self.nextlyrics, self.nextsave, self.nextlrc, self.nextsource = self.find_lyrics( artist, song )
-            if (self.allowtimer and self.getControl( 110 ).size() > 1):
+            if (self.allowtimer and (not self.refreshing) and self.getControl( 110 ).size() > 1):
                 self.lock.acquire()
                 try:
                     self.timer.cancel()
