@@ -125,17 +125,17 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 source = __language__( 30000 )
                 return lyrics, False, True, source
         # search lrc lyrics by scrapers
-        for self.scraper in self.scrapers:
-            if self.scraper[3]:
-                lyrics = self.scraper[1].get_lyrics( artist, song )
+        for scraper in self.scrapers:
+            if scraper[3]:
+                lyrics = scraper[1].get_lyrics( artist, song )
                 if ( lyrics ):
                     log('found lrc lyrics online')
-                    source = self.scraper[2]
+                    source = scraper[2]
                     if ( isinstance( lyrics, basestring ) ):
                         return lyrics, True, True, source
                     elif ( isinstance( lyrics, list ) and lyrics ):
                         if ( self.settings[ "auto_download" ] ):
-                            lyrics = self.scraper[1].get_lyrics_from_list( lyrics[0] )
+                            lyrics = scraper[1].get_lyrics_from_list( lyrics[0] )
                             return lyrics, True, True, source
                         else:
                             #return list
@@ -156,18 +156,28 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 source = __language__( 30000 )
                 return lyrics, False, False, source
         # search txt lyrics by scrapers
-        for self.scraper in self.scrapers:
-            if not self.scraper[3]:
-                lyrics = self.scraper[1].get_lyrics( artist, song )
+        for scraper in self.scrapers:
+            if not scraper[3]:
+                lyrics = scraper[1].get_lyrics( artist, song )
                 if ( lyrics ):
                     log('found txt lyrics online')
-                    source = self.scraper[2]
+                    source = scraper[2]
                     return lyrics, True, False, source
         log('no lyrics found')
         return '', False, False, None
 
     def get_lyrics_from_list( self, item ):
-        self.selectedlyrics = self.scraper[1].get_lyrics_from_list( self.menu_items[ item ] )
+        log('-------------3--------------')
+        log(item.getProperty('lyric'))
+        lyric = eval(item.getProperty('lyric'))
+        save = eval(item.getProperty('save'))
+        lrc = eval(item.getProperty('lrc'))
+        source = item.getProperty('source')
+        for item in self.scrapers:
+            if item[2] == source:
+                scraper = item[1]
+                break
+        self.selectedlyrics = scraper.get_lyrics_from_list( lyric ), save, lrc, source
 
     def get_lyrics_from_file( self, artist, song, getlrc ):
         if getlrc:
@@ -259,11 +269,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self.pOverlay.append( (time, x) )
         self.pOverlay.sort( cmp=lambda x,y: cmp(x[0], y[0]) )
 
-    def show_choices( self, choices ):
-        for song in choices:
-            self.getControl( 120 ).addItem( song[ 0 ] )
+    def show_choices( self, lyrics, save, lrc, source ):
+        listitems = []
+        for song in lyrics:
+            listitem = xbmcgui.ListItem(song[0])
+            listitem.setProperty('lyric', str(song))
+            listitem.setProperty('save', str(save))
+            listitem.setProperty('lrc', str(lrc))
+            listitem.setProperty('source', source)
+            listitems.append(listitem)
+        self.getControl( 120 ).addItems( listitems )
         self.getControl( 120 ).selectItem( 0 )
-        self.menu_items = choices
+        self.menu_items = True
 
     def reshow_choices( self ):
         if self.menu_items:
@@ -273,7 +290,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
             except:
                 pass
             self.lock.release()
+            self.getControl( 110 ).reset()
             self.show_control( 120 )
+            while not self.selected:
+                xbmc.sleep(50)
+            lyrics, save, lrc, source = self.selectedlyrics
+            self.selected = False
+            self.show_lyrics( lyrics, save, lrc, source )
 
     def reset_controls( self ):
         self.getControl( 100 ).reset()
@@ -293,7 +316,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def onClick( self, controlId ):
         if ( controlId == 120 ):
-            self.get_lyrics_from_list( self.getControl( 120 ).getSelectedPosition() )
+            self.get_lyrics_from_list( self.getControl( 120 ).getSelectedItem() )
             self.selected = True
 
     def onFocus( self, controlId ):
@@ -361,15 +384,15 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     lyrics, save, self.lrc, source = self.find_lyrics( artist, song )
                     if lyrics:
                         if isinstance( lyrics, list ):
-                            self.show_choices( lyrics )
+                            self.show_choices( lyrics, save, self.lrc, source )
                             self.getControl( 200 ).setLabel( source )
                             self.show_control( 120 )
                             while not self.selected:
                                 xbmc.sleep(50)
-                            lyrics = self.selectedlyrics
+                            lyrics = self.selectedlyrics[0]
                             self.selected = False
                         else:
-                            self.menu_items = None
+                            self.menu_items = False
                         self.show_lyrics( lyrics, save, self.lrc, source )
                     else:                    
                         self.getControl( 100 ).setText( __language__( 30001 ) )
