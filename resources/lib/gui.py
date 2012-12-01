@@ -109,10 +109,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             return lyrics
 
         lyrics = self.find_lyrics( song )
-        if lyrics:
-            self.save_lyrics_to_memory(lyrics)
-            return lyrics
-        return None
+        self.save_lyrics_to_memory(lyrics)
+        return lyrics
 
     def find_lyrics(self, song):
         # search embedded lrc lyrics
@@ -159,7 +157,12 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         success = self.save_lyrics_to_file( lyrics )
                     return lyrics
         log('no lyrics found')
-        return None
+        lyrics = Lyrics()
+        lyrics.song = song
+        lyrics.source = ''
+        lyrics.lrc = False
+        lyrics.lyrics = ''
+        return lyrics
 
     def get_lyrics_from_list( self, item ):
         lyrics = self.scraper[1].get_lyrics_from_list( self.menu_items[ item ] )
@@ -319,11 +322,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 if ( song and ( self.current_lyrics.song.filepath != song.filepath ) ):
                     self.stop_refresh()
                     lyrics = self.get_lyrics( song )
-                    if lyrics:
-                        self.current_lyrics = lyrics
+                    self.current_lyrics = lyrics
+                    if lyrics.lyrics:
                         self.show_lyrics(lyrics)
                     else:
-                        self.current_lyrics = Lyrics()
                         self.show_error()
                     break
                 xbmc.sleep( 50 )
