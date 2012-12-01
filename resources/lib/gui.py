@@ -37,6 +37,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.lock = thread.allocate_lock()
         self.timer = None
         self.allowtimer = True
+        self.refreshing = False
         self.songfile = None
         self.controlId = -1
         self.pOverlay = []
@@ -64,10 +65,22 @@ class GUI( xbmcgui.WindowXMLDialog ):
             if (self.allowtimer and cur_time < self.pOverlay[nums - 1][0]):
                 waittime = self.pOverlay[pos + 1][0] - cur_time
                 self.timer = Timer(waittime, self.refresh)
+                self.refreshing = True
                 self.timer.start()
+            else:
+                self.refreshing = False
             self.lock.release()
         except:
             self.lock.release()
+
+    def stop_refresh(self):
+        self.lock.acquire()
+        try:
+            self.timer.cancel()
+        except:
+            pass
+        self.lock.release()
+        self.refreshing = False
 
     def show_control( self, controlId ):
         self.getControl( 100 ).setVisible( controlId == 100 )
@@ -261,12 +274,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def reshow_choices( self ):
         if self.menu_items:
-            self.lock.acquire()
-            try:
-                self.timer.cancel()
-            except:
-                pass
-            self.lock.release()
+            self.stop_refresh()
             self.show_control( 120 )
 
     def reset_controls( self ):
@@ -276,13 +284,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 200 ).setLabel('')
 
     def exit_script( self ):
-        self.lock.acquire()
-        try:
-            self.timer.cancel()
-        except:
-            pass
         self.allowtimer = False
-        self.lock.release()
+        self.stop_refresh()
         self.close()
 
     def onClick( self, controlId ):
@@ -344,22 +347,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     artist, song = self.get_artist_from_filename( songfile )
                 if ( songfile and ( self.songfile != songfile ) ):
                     self.songfile = songfile
-                    self.lock.acquire()
-                    try:
-                        self.timer.cancel()
-                    except:
-                        pass
-                    self.lock.release()
+                    self.stop_refresh()
                     self.find_lyrics( artist, song )
                     break
                 xbmc.sleep( 50 )
-            if (self.allowtimer and self.getControl( 110 ).size() > 1):
-                self.lock.acquire()
-                try:
-                    self.timer.cancel()
-                except:
-                    pass
-                self.lock.release()
+            if (self.allowtimer and (not self.refreshing) and self.getControl( 110 ).size() > 1):
                 if self.lrc:
                     self.refresh()
 
