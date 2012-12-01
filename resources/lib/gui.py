@@ -20,6 +20,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.setup_all()
 
     def setup_all( self ):
+        try:
+            self.getControl( 299 ).setVisible(False)
+        except:
+            pass
         self.setup_variables()
         self.get_scraper_list()
         self.getMyPlayer()
@@ -348,8 +352,17 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     else:
                         self.show_error()
                     if lyrics.list:
+                        try:
+                            self.getControl( 299 ).setVisible(True)
+                        except:
+                            pass
                         self.prepare_list(lyrics)
+                        #TODO show icon in skin to indicate multiple lyrics are available
                     else:
+                        try:
+                            self.getControl( 299 ).setVisible(False)
+                        except:
+                            pass
                         self.getControl( 120 ).reset()
                     break
                 xbmc.sleep( 50 )
