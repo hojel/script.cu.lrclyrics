@@ -38,7 +38,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.timer = None
         self.allowtimer = True
         self.refreshing = False
-        self.songfile = None
         self.controlId = -1
         self.pOverlay = []
         self.scrapers = []
@@ -296,7 +295,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.exit_script()
         else:
             for cnt in range( 5 ):
-                songfile = ''
                 song = Song.current()
                 log("Artist: %s - Song: %s" % (song.artist, song.title))
                 if ( song and ( self.current_song.filepath != song.filepath ) ):
