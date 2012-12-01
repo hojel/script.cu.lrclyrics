@@ -167,8 +167,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         return '', False, False, None
 
     def get_lyrics_from_list( self, item ):
-        log('-------------3--------------')
-        log(item.getProperty('lyric'))
         lyric = eval(item.getProperty('lyric'))
         save = eval(item.getProperty('save'))
         lrc = eval(item.getProperty('lrc'))
