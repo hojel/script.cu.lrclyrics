@@ -161,7 +161,6 @@ class GUI( xbmcgui.WindowXMLDialog ):
         lyrics = Lyrics()
         lyrics.song = song
         lyrics.source = ''
-        lyrics.lrc = False
         lyrics.lyrics = ''
         return lyrics
 
@@ -247,7 +246,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.show_control( 100 )
         self.getControl( 200 ).setLabel('')
 
-    def show_lyrics( self, lyrics, save=False ):
+    def show_lyrics( self, lyrics ):
         self.reset_controls()
         self.getControl( 200 ).setLabel( lyrics.source )
         if lyrics.lrc:
