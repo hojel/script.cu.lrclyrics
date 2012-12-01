@@ -388,20 +388,16 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 if song and artist:
                     log("prefetch - Artist: %s - Song: %s" % (artist, song))
                     self.nextlyrics, self.nextsave, self.nextlrc, self.nextsource = self.find_lyrics( artist, song )
+            if (self.allowtimer and self.getControl( 110 ).size() > 1):
+                self.lock.acquire()
+                try:
+                    self.timer.cancel()
+                except:
+                    pass
+                self.lock.release()
+                if lrc:
+                    self.refresh()
 
-###   Do we need this code ?
-#
-#            if (self.allowtimer and self.getControl( 110 ).size() > 1):
-#                self.lock.acquire()
-#                try:
-#                    self.timer.cancel()
-#                except:
-#                    pass
-#                self.lock.release()
-#                if lrc:
-#                    self.refresh()
-#
-###
 
 class MyPlayer( xbmc.Player ):
     """ Player Class: calls function when song changes or playback ends """
