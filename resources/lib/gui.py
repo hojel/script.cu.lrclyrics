@@ -354,7 +354,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         pass
                     self.lock.release()
                     self.reset_controls()
-                    lyrics, save, lrc, source = self.find_lyrics( artist, song )
+                    lyrics, save, self.lrc, source = self.find_lyrics( artist, song )
                     if lyrics:
                         if isinstance( lyrics, list ):
                             self.show_choices( lyrics )
@@ -366,7 +366,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                             self.selected = False
                         else:
                             self.menu_items = None
-                        self.show_lyrics( lyrics, save, lrc, source )
+                        self.show_lyrics( lyrics, save, self.lrc, source )
                     else:                    
                         self.getControl( 100 ).setText( __language__( 30001 ) )
                         self.show_control( 100 )
@@ -395,7 +395,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 except:
                     pass
                 self.lock.release()
-                if lrc:
+                if self.lrc:
                     self.refresh()
 
 
