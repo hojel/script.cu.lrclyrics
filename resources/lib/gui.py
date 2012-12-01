@@ -42,7 +42,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.pOverlay = []
         self.scrapers = []
         self.fetchedLyrics = []
-        self.current_song = Song()
+        self.current_lyrics = Lyrics()
 
     def refresh(self):
         self.lock.acquire()
@@ -316,13 +316,14 @@ class GUI( xbmcgui.WindowXMLDialog ):
         else:
             for cnt in range( 5 ):
                 song = Song.current()
-                if ( song and ( self.current_song.filepath != song.filepath ) ):
-                    self.current_song = song
+                if ( song and ( self.current_lyrics.song.filepath != song.filepath ) ):
                     self.stop_refresh()
                     lyrics = self.get_lyrics( song )
                     if lyrics:
+                        self.current_lyrics = lyrics
                         self.show_lyrics(lyrics)
                     else:
+                        self.current_lyrics = Lyrics()
                         self.show_error()
                     break
                 xbmc.sleep( 50 )
@@ -335,7 +336,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     log( "Missing Artist or Song name in ID3 tag for next track" )
 
             if (self.allowtimer and (not self.refreshing) and self.getControl( 110 ).size() > 1):
-                if self.current_song.lrc:
+                if self.current_lyrics.lrc:
                     self.refresh()
 
 class MyPlayer( xbmc.Player ):
