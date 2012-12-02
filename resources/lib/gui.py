@@ -246,7 +246,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def show_lyrics( self, lyrics ):
         self.reset_controls()
-        self.getControl( 200 ).setLabel( lyrics.source )
+        if lyrics.list:
+            source = '%s (%d)' % (lyrics.source, len(lyrics.list))
+        else:
+            source = lyrics.source
+        self.getControl( 200 ).setLabel( source )
         if lyrics.lrc:
             self.parser_lyrics( lyrics.lyrics )
             for time, line in self.pOverlay:
