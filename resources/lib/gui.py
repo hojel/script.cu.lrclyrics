@@ -85,8 +85,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.timer.cancel()
         except:
             pass
-        self.lock.release()
         self.refreshing = False
+        self.lock.release()
 
     def show_control( self, controlId ):
         self.getControl( 100 ).setVisible( controlId == 100 )
