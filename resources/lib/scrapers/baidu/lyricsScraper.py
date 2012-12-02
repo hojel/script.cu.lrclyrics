@@ -35,6 +35,8 @@ class LyricsFetcher:
             xml_str = urllib.urlopen(url).read()
             lrcid_pattern = re.compile(r'<lrcid>(.+?)</lrcid>')
             lrcid = int(re.search(lrcid_pattern, xml_str).group(1))
+            if lrcid == 0:
+                return None
             lrc_url = self.LRC_URL % (lrcid/100, lrcid)
             lyr = urllib.urlopen(lrc_url).read()
         except:
