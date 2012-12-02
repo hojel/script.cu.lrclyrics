@@ -131,9 +131,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 log('found lrc lyrics from file')
                 return lyrics
         # search lrc lyrics by scrapers
-        for self.scraper in self.scrapers:
-            if self.scraper[3]:
-                lyrics = self.scraper[1].get_lyrics( song )
+        for scraper in self.scrapers:
+            if scraper[3]:
+                lyrics = scraper[1].get_lyrics( song )
                 if ( lyrics ):
                     log('found lrc lyrics online')
                     if ( __addon__.getSetting( "save_lyrics" ) == "true" ):
@@ -153,9 +153,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 log('found txt lyrics from file')
                 return lyrics
         # search txt lyrics by scrapers
-        for self.scraper in self.scrapers:
-            if not self.scraper[3]:
-                lyrics = self.scraper[1].get_lyrics( song )
+        for scraper in self.scrapers:
+            if not scraper[3]:
+                lyrics = scraper[1].get_lyrics( song )
                 if ( lyrics ):
                     log('found txt lyrics online')
                     if ( __addon__.getSetting( "save_lyrics" ) == "true" ):
@@ -170,17 +170,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def get_lyrics_from_list( self, item ):
         lyric = eval(item.getProperty('lyric'))
-        source = item.getProperty('source')
         for item in self.scrapers:
-            if item[2] == source:
+            if item[2] == self.current_lyrics.source:
                 scraper = item[1]
-                lrc = item[3]
                 break
-        lyrics = Lyrics()
-        lyrics.lyrics = scraper.get_lyrics_from_list( lyric )
-        lyrics.source = source
-        lyrics.lrc = lrc
-        self.selectedlyrics = lyrics
+        self.current_lyrics.lyrics = scraper.get_lyrics_from_list( lyric )
 
     def get_lyrics_from_memory (self, song):
         for l in self.fetchedLyrics:
@@ -285,12 +279,11 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     self.pOverlay.append( (time, x) )
         self.pOverlay.sort( cmp=lambda x,y: cmp(x[0], y[0]) )
 
-    def prepare_list( self, lyrics ):
+    def prepare_list( self, list ):
         listitems = []
-        for song in lyrics.list:
+        for song in list:
             listitem = xbmcgui.ListItem(song[0])
             listitem.setProperty('lyric', str(song))
-            listitem.setProperty('source', lyrics.source)
             listitems.append(listitem)
         self.getControl( 120 ).addItems( listitems )
 
@@ -301,11 +294,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.show_control( 120 )
             while not self.selected:
                 xbmc.sleep(50)
-            lyrics = self.selectedlyrics
             self.selected = False
-            self.show_lyrics( lyrics )
+            self.show_lyrics( self.current_lyrics )
             if ( __addon__.getSetting( "save_lyrics" ) == "true" ):
-                success = self.save_lyrics_to_file( lyrics )
+                success = self.save_lyrics_to_file( self.current_lyrics )
 
     def reset_controls( self ):
         self.getControl( 100 ).reset()
@@ -351,18 +343,18 @@ class GUI( xbmcgui.WindowXMLDialog ):
                         self.show_lyrics(lyrics)
                     else:
                         self.show_error()
+                    self.getControl( 120 ).reset()
                     if lyrics.list:
                         try:
                             self.getControl( 299 ).setVisible(True)
                         except:
                             pass
-                        self.prepare_list(lyrics)
+                        self.prepare_list(lyrics.list)
                     else:
                         try:
                             self.getControl( 299 ).setVisible(False)
                         except:
                             pass
-                        self.getControl( 120 ).reset()
                     break
                 xbmc.sleep( 50 )
 
