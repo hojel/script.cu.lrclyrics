@@ -48,6 +48,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.scrapers = []
         self.fetchedLyrics = []
         self.current_lyrics = Lyrics()
+        self.scroll_line = int(__addon__.getSetting( "scroll_line" ))
 
     def refresh(self):
         self.lock.acquire()
@@ -62,10 +63,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
             else:
                 while (pos < nums - 1 and self.pOverlay[pos + 1][0] < cur_time):
                     pos = pos +1
-                if (pos + 5 > nums - 1):
+                if (pos + self.scroll_line > nums - 1):
                     self.getControl( 110 ).selectItem( nums - 1 )
                 else:
-                    self.getControl( 110 ).selectItem( pos + 5 )
+                    self.getControl( 110 ).selectItem( pos + self.scroll_line )
             self.getControl( 110 ).selectItem( pos )
             self.setFocus( self.getControl( 110 ) )
             if (self.allowtimer and cur_time < self.pOverlay[nums - 1][0]):
