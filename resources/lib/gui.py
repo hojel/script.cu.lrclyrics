@@ -48,7 +48,16 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.scrapers = []
         self.fetchedLyrics = []
         self.current_lyrics = Lyrics()
-        self.scroll_line = int(__addon__.getSetting( "scroll_line" ))
+        self.scroll_line = int(self.get_page_lines() / 2)
+
+    def get_page_lines( self ):
+        self.getControl( 110 ).setVisible( False )
+        listitem = xbmcgui.ListItem()
+        while xbmc.getInfoLabel('Container(110).NumPages') != '2':
+            self.getControl(110).addItem(listitem)
+            xbmc.sleep(10)
+        lines = self.getControl( 110 ).size() - 1
+        return lines
 
     def refresh(self):
         self.lock.acquire()
