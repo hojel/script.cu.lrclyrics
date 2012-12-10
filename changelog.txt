@@ -1,3 +1,6 @@
+v1.0.2
+- make lyrics available as a window property
+
 v1.0.1
 - fixed can't change lyric for track in cue/ape file
 - fixed decode error in scrape minilyrics

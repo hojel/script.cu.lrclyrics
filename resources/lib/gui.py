@@ -250,11 +250,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
             return False
 
     def show_error(self):
+        xbmcgui.Window( 10000 ).clearProperty('culrc.lyrics')
         self.getControl( 100 ).setText( __language__( 30001 ) )
         self.show_control( 100 )
         self.getControl( 200 ).setLabel('')
 
     def show_lyrics( self, lyrics ):
+        xbmcgui.Window( 10000 ).setProperty('culrc.lyrics', lyrics.lyrics)
         self.reset_controls()
         if lyrics.list:
             source = '%s (%d)' % (lyrics.source, len(lyrics.list))
