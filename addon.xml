@@ -2,6 +2,7 @@
 <addon id="script.cu.lrclyrics" name="CU LRC Lyrics" version="1.0.0" provider-name="Taxigps, ronie">
 	<requires>
 		<import addon="xbmc.python" version="2.1"/>
+		<import addon="script.module.chardet" version="2.1.1"/>
 	</requires>
 	<extension point="xbmc.python.lyrics" library="default.py"/>
 	<extension point="xbmc.addon.metadata">
