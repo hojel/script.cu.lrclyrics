@@ -325,6 +325,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def exit_script( self ):
         xbmcgui.Window( 10000 ).clearProperty('culrc.lyrics')
+        xbmcgui.Window( 10000 ).clearProperty('culrc.source')
         xbmcgui.Window( 10000 ).clearProperty('culrc.running')
         self.allowtimer = False
         self.stop_refresh()
