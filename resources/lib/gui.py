@@ -24,6 +24,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.getControl( 299 ).setVisible(False)
         except:
             pass
+        xbmcgui.Window( 10000 ).setProperty('culrc.running', 'true')
         self.setup_variables()
         self.get_scraper_list()
         self.getMyPlayer()
@@ -251,12 +252,14 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def show_error(self):
         xbmcgui.Window( 10000 ).clearProperty('culrc.lyrics')
+        xbmcgui.Window( 10000 ).clearProperty('culrc.source')
         self.getControl( 100 ).setText( __language__( 30001 ) )
         self.show_control( 100 )
         self.getControl( 200 ).setLabel('')
 
     def show_lyrics( self, lyrics ):
         xbmcgui.Window( 10000 ).setProperty('culrc.lyrics', lyrics.lyrics)
+        xbmcgui.Window( 10000 ).setProperty('culrc.source', lyrics.source)
         self.reset_controls()
         if lyrics.list:
             source = '%s (%d)' % (lyrics.source, len(lyrics.list))
@@ -321,6 +324,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 200 ).setLabel('')
 
     def exit_script( self ):
+        xbmcgui.Window( 10000 ).clearProperty('culrc.lyrics')
+        xbmcgui.Window( 10000 ).clearProperty('culrc.running')
         self.allowtimer = False
         self.stop_refresh()
         self.close()
