@@ -24,8 +24,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.getControl( 299 ).setVisible(False)
         except:
             pass
-        xbmcgui.Window( 10000 ).setProperty('culrc.running', 'true')
         self.setup_variables()
+        self.win.setProperty('culrc.running', 'true')
         self.get_scraper_list()
         self.getMyPlayer()
         if ( __addon__.getSetting( "save_lyrics_path" ) == "" ):
@@ -50,6 +50,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.fetchedLyrics = []
         self.current_lyrics = Lyrics()
         self.scroll_line = int(self.get_page_lines() / 2)
+        self.win = xbmcgui.Window( 10000 )
 
     def get_page_lines( self ):
         self.getControl( 110 ).setVisible( False )
@@ -251,16 +252,12 @@ class GUI( xbmcgui.WindowXMLDialog ):
             return False
 
     def show_error(self):
-        xbmcgui.Window( 10000 ).clearProperty('culrc.lyrics')
-        xbmcgui.Window( 10000 ).clearProperty('culrc.source')
         self.getControl( 100 ).setText( __language__( 30001 ) )
         self.show_control( 100 )
-        self.getControl( 200 ).setLabel('')
 
     def show_lyrics( self, lyrics ):
-        xbmcgui.Window( 10000 ).setProperty('culrc.lyrics', lyrics.lyrics)
-        xbmcgui.Window( 10000 ).setProperty('culrc.source', lyrics.source)
-        self.reset_controls()
+        self.win.setProperty('culrc.lyrics', lyrics.lyrics)
+        self.win.setProperty('culrc.source', lyrics.source)
         if lyrics.list:
             source = '%s (%d)' % (lyrics.source, len(lyrics.list))
         else:
@@ -322,11 +319,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
         self.getControl( 100 ).reset()
         self.getControl( 110 ).reset()
         self.getControl( 200 ).setLabel('')
+        self.win.clearProperty('culrc.lyrics')
+        self.win.clearProperty('culrc.source')
 
     def exit_script( self ):
-        xbmcgui.Window( 10000 ).clearProperty('culrc.lyrics')
-        xbmcgui.Window( 10000 ).clearProperty('culrc.source')
-        xbmcgui.Window( 10000 ).clearProperty('culrc.running')
+        self.win.clearProperty('culrc.lyrics')
+        self.win.clearProperty('culrc.source')
+        self.win.clearProperty('culrc.running')
         self.allowtimer = False
         self.stop_refresh()
         self.close()
@@ -359,6 +358,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 song = Song.current()
                 if ( song and ( self.current_lyrics.song != song ) ):
                     self.stop_refresh()
+                    self.reset_controls()
                     lyrics = self.get_lyrics( song )
                     self.current_lyrics = lyrics
                     if lyrics.lyrics:
