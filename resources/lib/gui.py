@@ -316,7 +316,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 success = self.save_lyrics_to_file( self.current_lyrics )
 
     def reset_controls( self ):
-        self.getControl( 100 ).reset()
+        self.getControl( 100 ).setText(xbmc.getLocalizedString(194))
         self.getControl( 110 ).reset()
         self.getControl( 200 ).setLabel('')
         self.win.clearProperty('culrc.lyrics')
