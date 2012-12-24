@@ -12,7 +12,7 @@ __profile__   = xbmc.translatePath( __addon__.getAddonInfo('profile') ).decode("
 __language__  = __addon__.getLocalizedString
 
 # Shared resources
-BASE_RESOURCE_PATH = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' ) )
+BASE_RESOURCE_PATH = xbmc.translatePath( os.path.join( __cwd__, 'resources', 'lib' ).encode("utf-8") ).decode("utf-8")
 sys.path.append (BASE_RESOURCE_PATH)
 
 # Start the main gui
