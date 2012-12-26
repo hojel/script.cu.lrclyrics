@@ -29,6 +29,6 @@ you can optionally save them to a file for future use.
 
 
 properties for other addons:
-Window(Home).Property(culrc.lyrics)  - the current lyrics.
-Window(Home).Property(culrc.source)  - source or scraped used for the current lyrics.
-Window(Home).Property(culrc.running) - 'true' when the lyrics script is running, empty if not.
+Window(Home).Property(culrc.lyrics)  - shows the current lyrics, including timing info in case of lrc lyrics.
+Window(Home).Property(culrc.source)  - source or scraper that was used to find the current lyrics.
+Window(Home).Property(culrc.running) - returns 'true' when the lyrics script is running, empty if not.
