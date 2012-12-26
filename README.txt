@@ -26,3 +26,9 @@ depending on which options you've enabled, the script searches for lyrics in thi
 
 when the scripts downloads lyrics through one of the scrapers,
 you can optionally save them to a file for future use.
+
+
+properties for other addons:
+Window(Home).Property(culrc.lyrics)  - the current lyrics.
+Window(Home).Property(culrc.source)  - source or scraped used for the current lyrics.
+Window(Home).Property(culrc.running) - 'true' when the lyrics script is running, empty if not.
