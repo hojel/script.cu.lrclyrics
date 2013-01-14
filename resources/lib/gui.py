@@ -232,20 +232,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                 lyr = lyrics.lyrics
             else:
                 lyr = lyrics.lyrics.encode('utf-8')
-
-# xbmcvfs.File().write() corrupts files
-# disable it until the bug is fixed
-# http://trac.xbmc.org/ticket/13545
-#            lyrics_file = xbmcvfs.File( self.song_path, "w" )
-#            lyrics_file.write( lyr )
-#            lyrics_file.close()
-
-            tmp_name = os.path.join(__profile__, u'lyrics.tmp')
-            tmp_file = open(tmp_name , "w" )
-            tmp_file.write( lyr )
-            tmp_file.close()
-            xbmcvfs.copy(tmp_name, song_path)
-            xbmcvfs.delete(tmp_name)
+            lyrics_file = xbmcvfs.File( self.song_path, "w" )
+            lyrics_file.write( lyr )
+            lyrics_file.close()
             return True
         except:
             log( "failed to save lyrics" )
