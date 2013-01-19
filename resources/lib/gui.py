@@ -242,6 +242,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def show_error(self):
         self.getControl( 100 ).setText( __language__( 30001 ) )
+        self.win.setProperty('culrc.lyrics', __language__( 30001 ))
         self.show_control( 100 )
 
     def show_lyrics( self, lyrics ):
