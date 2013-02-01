@@ -224,7 +224,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
             self.fetchedLyrics =  self.fetchedLyrics[:10]
 
     def save_lyrics_to_file( self, lyrics ):
-        if True:
+        try:
             song_path = lyrics.song.path1(lyrics.lrc)
             if ( not xbmcvfs.exists( os.path.dirname( song_path ) ) ):
                 xbmcvfs.mkdirs( os.path.dirname( song_path ) )
@@ -236,9 +236,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
             lyrics_file.write( lyr )
             lyrics_file.close()
             return True
-#        except:
-#            log( "failed to save lyrics" )
-#            return False
+        except:
+            log( "failed to save lyrics" )
+            return False
 
     def show_error(self):
         self.getControl( 100 ).setText( __language__( 30001 ) )
