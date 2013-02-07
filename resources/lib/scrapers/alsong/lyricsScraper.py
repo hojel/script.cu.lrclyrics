@@ -5,6 +5,7 @@ Scraper for http://lyrics.alsong.co.kr/
 edge
 """
 
+import sys
 import socket
 import hashlib
 import urllib2
@@ -68,33 +69,27 @@ class LyricsFetcher:
         lyrics.source = __title__
         lyrics.lrc = __lrc__
 
-        artist = song.artist
-        title = song.title
         key = alsongClient.GetKeyFromFile( song.filepath )
         if not key:
             return None
 
-        title = artist+' - '+title
-        lyr = self.get_lyrics_from_list( (title,key,artist,song) )
-        if not lyr:
-            return None
-        lyrics.lyrics = lyr
-        return lyrics
-
-    def get_lyrics_from_list(self, link):
-        title,key,artist,song = link
-        print key, artist, song
-
-        headers = { 'Content-Type' : 'text/xml; charset=utf-8' }
-        request = urllib2.Request(ALSONG_URL, ALSONG_TMPL % key, headers)
         try:
+            headers = { 'Content-Type' : 'text/xml; charset=utf-8' }
+            request = urllib2.Request(ALSONG_URL, ALSONG_TMPL % key, headers)
             response = urllib2.urlopen(request)
             Page = response.read()
-        except Exception, e:
-            print e
-
+        except:
+            log( "%s: %s::%s (%d) [%s]" % (
+                    __title__, self.__class__.__name__,
+                    sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                    sys.exc_info()[ 2 ].tb_lineno,
+                    sys.exc_info()[ 1 ]
+                ))
+            return None
+        
         tree = xml.parseString( Page )
         if tree.getElementsByTagName("strInfoID")[0].childNodes[0].data == '-1':
-            return ''
-        lyric = tree.getElementsByTagName("strLyric")[0].childNodes[0].data.replace('<br>','\n')
-        return lyric.encode('utf-8')
+            return None
+        lyr = tree.getElementsByTagName("strLyric")[0].childNodes[0].data.replace('<br>','\n')
+        lyrics.lyrics = lyr.encode('utf-8')
+        return lyrics

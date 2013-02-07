@@ -123,27 +123,3 @@ class AudioFile(object):
             	# it was the last metadata block
 		self.audioStart = self.f.seek(0,1)
                 return
-
-if ( __name__ == '__main__' ):
-    analyzer = AudioFile()
-    testdir = os.path.join('d:'+os.sep,'Music','test')+os.sep
-
-    analyzer.Open(testdir+'test.mp3')
-    print "mp3: "+analyzer.ReadAudioStream(10).encode("hex")
-    analyzer.Close()
-
-    analyzer.Open(testdir+'test.ogg')
-    print "ogg: "+analyzer.ReadAudioStream(10).encode("hex")
-    analyzer.Close()
-
-    analyzer.Open(testdir+'test.wma')
-    print "wma: "+analyzer.ReadAudioStream(10).encode("hex")
-    analyzer.Close()
-
-    analyzer.Open(testdir+'test.flac')
-    print "flac: "+analyzer.ReadAudioStream(10).encode("hex")
-    analyzer.Close()
-
-    analyzer.Open(testdir+'test.wav')
-    print "wav: "+analyzer.ReadAudioStream(10).encode("hex")
-    analyzer.Close()

@@ -5,6 +5,7 @@ Scraper for http://newlyrics.gomtv.com/
 edge
 """
 
+import sys
 import socket
 import hashlib
 import urllib
@@ -44,48 +45,41 @@ class LyricsFetcher:
     def __init__( self ):
         self.base_url = "http://newlyrics.gomtv.com/"
 
-    def get_lyrics(self, artist, song, songfile):
+    def get_lyrics(self, song):
         log( "%s: searching lyrics for %s - %s" % (__title__, song.artist, song.title))
         lyrics = Lyrics()
         lyrics.song = song
         lyrics.source = __title__
         lyrics.lrc = __lrc__
 
-        artist = song.artist
-        title = song.title
         key = gomClient.GetKeyFromFile( song.filepath )
         if not key:
             return None
 
-        title = artist+' - '+song
-        lyr = self.get_lyrics_from_list( (title,key,artist,song) )
-        if not lyr:
-            return None
-        lyrics.lyrics = lyr
-        return lyrics
-
-    def get_lyrics_from_list(self, link):
-        title,key,artist,song = link
-        print key, artist, song
-        print GOM_URL %(key, urllib.quote(song.decode("utf-8").encode("euc-kr")), urllib.quote(artist.decode("utf-8").encode("euc-kr")) )
-
+        url = GOM_URL %(key, urllib.quote(song.title.decode("utf-8").encode("euc-kr")), urllib.quote(song.artist.decode("utf-8").encode("euc-kr")))
         try:
-            response = urllib.urlopen( GOM_URL %(key, urllib.quote(song.decode("utf-8").encode("euc-kr")), urllib.quote(artist.decode("utf-8").encode("euc-kr")) ) )
+            response = urllib.urlopen( url )
             Page = response.read()
-        except Exception, e:
-            print e
+        except:
+            log( "%s: %s::%s (%d) [%s]" % (
+                    __title__, self.__class__.__name__,
+                    sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
+                    sys.exc_info()[ 2 ].tb_lineno,
+                    sys.exc_info()[ 1 ]
+                ))
+            return None
 
         if Page[:Page.find('>')+1] != '<lyrics_reply result="0">':
-            print Page[:Page.find('>')+1]
-            return ''
+            return None
         syncs = re.compile('<sync start="(\d+)">([^<]*)</sync>').findall(Page)
-        lyric = []
-        lyric.append( "[ti:%s]" %song )
-        lyric.append( "[ar:%s]" %artist )
+        lyrline = []
+        lyrline.append( "[ti:%s]" %song.title )
+        lyrline.append( "[ar:%s]" %song.artist )
         for sync in syncs:
             # timeformat conversion
             t = "%02d:%02d.%02d" % gomClient.mSecConv( int(sync[0]) )
             # unescape string
             s = unicode(sync[1], "euc-kr").encode("utf-8").replace("&apos;","'").replace("&quot;",'"')
-            lyric.append( "[%s]%s" %(t,s) )
-        return '\n'.join( lyric )
+            lyrline.append( "[%s]%s" %(t,s) )
+        lyrics.lyrics = '\n'.join( lyrline )
+        return lyrics
