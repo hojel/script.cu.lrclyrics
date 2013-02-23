@@ -95,7 +95,7 @@ class Song:
             ext = '.lrc'
         else:
             ext = '.txt'
-        if ( __addon__.getSetting( "save_artist_folder" ) == "true" ):
+        if ( __addon__.getSetting( "save_filename_format" ) == "0" ):
             return unicode( os.path.join( __addon__.getSetting( "save_lyrics_path" ), self.sanitize(self.artist), self.sanitize(self.title) + ext ), "utf-8" )
         else:
             return unicode( os.path.join( __addon__.getSetting( "save_lyrics_path" ), self.sanitize(self.artist) + " - " + self.sanitize(self.title) + ext ), "utf-8" )
@@ -108,8 +108,8 @@ class Song:
         dirname = os.path.dirname(self.filepath)
         basename = os.path.basename(self.filepath)
         filename = basename.rsplit( ".", 1 )[ 0 ]
-        if ( __addon__.getSetting( "read_subfolder" ) == "true" ):
-            return unicode( os.path.join( dirname, __addon__.getSetting( "read_subfolder_path" ), filename + ext ), "utf-8" )
+        if ( __addon__.getSetting( "save_subfolder" ) == "true" ):
+            return unicode( os.path.join( dirname, __addon__.getSetting( "save_subfolder_path" ), filename + ext ), "utf-8" )
         else:
             return unicode( os.path.join( dirname, filename + ext ), "utf-8" )
 
