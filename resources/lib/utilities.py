@@ -14,7 +14,7 @@ __profile__   = sys.modules[ "__main__" ].__profile__
 __cwd__       = sys.modules[ "__main__" ].__cwd__
 
 CANCEL_DIALOG = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
-LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "scrapers")
+LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "culrcscrapers")
 
 def log(txt):
     if isinstance (txt,str):
