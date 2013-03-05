@@ -85,6 +85,10 @@ msgctxt "#30112"
 msgid "- Sub folder name"
 msgstr ""
 
+msgctxt "#30113"
+msgid "Save lyrics to song folder"
+msgstr ""
+
 #empty strings from id 30113 to 30149
 
 msgctxt "#30150"
