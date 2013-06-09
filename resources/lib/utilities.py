@@ -43,8 +43,8 @@ def get_textfile(filepath):
 
 def get_artist_from_filename( filename ):
     try:
-        artist = filename
-        title = filename
+        artist = ''
+        title = ''
         basename = os.path.basename( filename )
         # Artist - title.ext
         if ( __addon__.getSetting( "read_filename_format" ) == "0" ):

@@ -125,7 +125,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
         if lyrics:
             return lyrics
 
-        lyrics = self.find_lyrics( song )
+        if song.title:
+            lyrics = self.find_lyrics( song )
+        else:
+            lyrics = Lyrics()
+            lyrics.song = song
+            lyrics.source = ''
+            lyrics.lyrics = ''
         self.save_lyrics_to_memory(lyrics)
         return lyrics
 
