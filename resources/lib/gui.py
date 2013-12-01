@@ -137,7 +137,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
 
     def find_lyrics(self, song):
         # search embedded lrc lyrics
-        if ( __addon__.getSetting( "search_embedded" ) == "true" ) and song.analyze_safe:
+        if ( __addon__.getSetting( "search_embedded" ) == "true" and song.analyze_safe ):
             lyrics = getEmbedLyrics(song, True)
             if ( lyrics ):
                 log('found embedded lrc lyrics')
@@ -158,7 +158,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                     return lyrics
 
         # search embedded txt lyrics
-        if ( __addon__.getSetting( "search_embedded" ) == "true" ) and song.analyze_safe:
+        if ( __addon__.getSetting( "search_embedded" ) == "true" and song.analyze_safe ):
             lyrics = getEmbedLyrics(song, False)
             if lyrics:
                 log('found embedded txt lyrics')
