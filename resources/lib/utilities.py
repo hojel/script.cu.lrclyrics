@@ -164,7 +164,7 @@ class Song:
             song.artist, song.title = get_artist_from_filename( song.filepath )
         
         #Check if analyzing the stream is discouraged
-        do_not_analyze = xbmc.getInfoLabel('MusicPlayer.Property(DoNotAnalyze)')
+        do_not_analyze = xbmc.getInfoLabel('MusicPlayer.Property(do_not_analyze)')
         if do_not_analyze == 'true':
             song.analyze_safe = False
         
