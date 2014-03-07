@@ -1,8 +1,9 @@
 import sys
 import os
+import re
 import chardet
 import unicodedata
-import xbmc, xbmcvfs
+import xbmc, xbmcvfs, xbmcgui
 if sys.version_info < (2, 7):
     import simplejson
 else:
@@ -14,7 +15,9 @@ __profile__   = sys.modules[ "__main__" ].__profile__
 __cwd__       = sys.modules[ "__main__" ].__cwd__
 
 CANCEL_DIALOG = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
+ACTION_OSD = ( 122, )
 LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "culrcscrapers")
+WIN = xbmcgui.Window( 10000 )
 
 def log(txt):
     if isinstance (txt,str):
@@ -38,10 +41,10 @@ def get_textfile(filepath):
             return unicode( data, enc['encoding'] ).encode( "utf-8")
     except UnicodeDecodeError:
         return data
-    except IOError:
+    except:
         return None
 
-def get_artist_from_filename( filename ):
+def get_artist_from_filename(filename):
     try:
         artist = ''
         title = ''
@@ -65,7 +68,7 @@ def get_artist_from_filename( filename ):
     return artist, title
 
 class Lyrics:
-    def __init__( self ):
+    def __init__(self):
         self.song = Song()
         self.lyrics = ""
         self.source = ""
@@ -73,7 +76,7 @@ class Lyrics:
         self.lrc = False
 
 class Song:
-    def __init__( self ):
+    def __init__(self):
         self.artist = ""
         self.title = ""
         self.filepath = ""
@@ -119,7 +122,7 @@ class Song:
     def current():
         song = Song.by_offset(0)
 
-        if not song.artist and not xbmc.getInfoLabel( "MusicPlayer.TimeRemaining"):
+        if not song.artist and not xbmc.getInfoLabel("MusicPlayer.TimeRemaining"):
             # no artist and infinite playing time ? We probably listen to a radio
             # which usually set the song title as "Artist - Title" (via ICY StreamTitle)
             sep = song.title.find("-")
@@ -131,14 +134,11 @@ class Song:
                 #  Radio version, short version, year of the song...
                 # It often disturbs the lyrics search so we remove it
                 song.title = re.sub(r'\([^\)]*\)$', '', song.title)
-
-        log( "Current Song: %s:%s" % (song.artist, song.title))
         return song
 
     @staticmethod
     def next():
         song = Song.by_offset(1)
-        log( "Next Song: %s:%s" % (song.artist, song.title))
         if song.artist != '' and song.title != '':
             return song
 
@@ -162,6 +162,8 @@ class Song:
         song.artist = xbmc.getInfoLabel( "MusicPlayer%s.Artist" % offset_str)
         if ( song.filepath and ( (not song.title) or (not song.artist) or (__addon__.getSetting( "read_filename" ) == "true") ) ):
             song.artist, song.title = get_artist_from_filename( song.filepath )
+        if __addon__.getSetting( "clean_title" ) == "true":
+            song.title = re.sub(r'\([^\)]*\)$', '', song.title)
         
         #Check if analyzing the stream is discouraged
         do_not_analyze = xbmc.getInfoLabel('MusicPlayer.Property(do_not_analyze)')
