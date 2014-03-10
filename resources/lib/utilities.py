@@ -92,7 +92,7 @@ class Song:
             return cmp(deAccent(self.title), deAccent(song.title))
 
     def sanitize(self, str):
-        return str.replace( "\\", "_" ).replace( "/", "_" ).replace(":","_").replace("?","_").replace("!","_")
+        return str.replace( "\\", "_" ).replace( "/", "_" ).replace(":","_").replace("?","_").replace("!","_").strip('.')
 
     def path1(self, lrc):
         if lrc:
