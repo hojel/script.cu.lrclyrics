@@ -1,8 +1,9 @@
 import sys
 import os
+import re
 import chardet
 import unicodedata
-import xbmc, xbmcvfs
+import xbmc, xbmcvfs, xbmcgui
 if sys.version_info < (2, 7):
     import simplejson
 else:
@@ -14,7 +15,9 @@ __profile__   = sys.modules[ "__main__" ].__profile__
 __cwd__       = sys.modules[ "__main__" ].__cwd__
 
 CANCEL_DIALOG = ( 9, 10, 92, 216, 247, 257, 275, 61467, 61448, )
-LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "scrapers")
+ACTION_OSD = ( 122, )
+LYRIC_SCRAPER_DIR = os.path.join(__cwd__, "resources", "lib", "culrcscrapers")
+WIN = xbmcgui.Window( 10000 )
 
 def log(txt):
     if isinstance (txt,str):
@@ -38,13 +41,13 @@ def get_textfile(filepath):
             return unicode( data, enc['encoding'] ).encode( "utf-8")
     except UnicodeDecodeError:
         return data
-    except IOError:
+    except:
         return None
 
-def get_artist_from_filename( filename ):
+def get_artist_from_filename(filename):
     try:
-        artist = filename
-        title = filename
+        artist = ''
+        title = ''
         basename = os.path.basename( filename )
         # Artist - title.ext
         if ( __addon__.getSetting( "read_filename_format" ) == "0" ):
@@ -65,7 +68,7 @@ def get_artist_from_filename( filename ):
     return artist, title
 
 class Lyrics:
-    def __init__( self ):
+    def __init__(self):
         self.song = Song()
         self.lyrics = ""
         self.source = ""
@@ -73,10 +76,11 @@ class Lyrics:
         self.lrc = False
 
 class Song:
-    def __init__( self ):
+    def __init__(self):
         self.artist = ""
         self.title = ""
         self.filepath = ""
+        self.analyze_safe = True
 
     def __str__(self):
         return "Artist: %s, Title: %s" % ( self.artist, self.title)
@@ -88,14 +92,14 @@ class Song:
             return cmp(deAccent(self.title), deAccent(song.title))
 
     def sanitize(self, str):
-        return str.replace( "\\", "_" ).replace( "/", "_" ).replace(":","_").replace("?","_").replace("!","_")
+        return str.replace( "\\", "_" ).replace( "/", "_" ).replace(":","_").replace("?","_").replace("!","_").strip('.')
 
     def path1(self, lrc):
         if lrc:
             ext = '.lrc'
         else:
             ext = '.txt'
-        if ( __addon__.getSetting( "save_artist_folder" ) == "true" ):
+        if ( __addon__.getSetting( "save_filename_format" ) == "0" ):
             return unicode( os.path.join( __addon__.getSetting( "save_lyrics_path" ), self.sanitize(self.artist), self.sanitize(self.title) + ext ), "utf-8" )
         else:
             return unicode( os.path.join( __addon__.getSetting( "save_lyrics_path" ), self.sanitize(self.artist) + " - " + self.sanitize(self.title) + ext ), "utf-8" )
@@ -108,8 +112,8 @@ class Song:
         dirname = os.path.dirname(self.filepath)
         basename = os.path.basename(self.filepath)
         filename = basename.rsplit( ".", 1 )[ 0 ]
-        if ( __addon__.getSetting( "read_subfolder" ) == "true" ):
-            return unicode( os.path.join( dirname, __addon__.getSetting( "read_subfolder_path" ), filename + ext ), "utf-8" )
+        if ( __addon__.getSetting( "save_subfolder" ) == "true" ):
+            return unicode( os.path.join( dirname, __addon__.getSetting( "save_subfolder_path" ), filename + ext ), "utf-8" )
         else:
             return unicode( os.path.join( dirname, filename + ext ), "utf-8" )
 
@@ -118,7 +122,7 @@ class Song:
     def current():
         song = Song.by_offset(0)
 
-        if not song.artist and not xbmc.getInfoLabel( "MusicPlayer.TimeRemaining"):
+        if not song.artist and not xbmc.getInfoLabel("MusicPlayer.TimeRemaining"):
             # no artist and infinite playing time ? We probably listen to a radio
             # which usually set the song title as "Artist - Title" (via ICY StreamTitle)
             sep = song.title.find("-")
@@ -130,14 +134,11 @@ class Song:
                 #  Radio version, short version, year of the song...
                 # It often disturbs the lyrics search so we remove it
                 song.title = re.sub(r'\([^\)]*\)$', '', song.title)
-
-        log( "Current Song: %s:%s" % (song.artist, song.title))
         return song
 
     @staticmethod
     def next():
         song = Song.by_offset(1)
-        log( "Next Song: %s:%s" % (song.artist, song.title))
         if song.artist != '' and song.title != '':
             return song
 
@@ -161,5 +162,12 @@ class Song:
         song.artist = xbmc.getInfoLabel( "MusicPlayer%s.Artist" % offset_str)
         if ( song.filepath and ( (not song.title) or (not song.artist) or (__addon__.getSetting( "read_filename" ) == "true") ) ):
             song.artist, song.title = get_artist_from_filename( song.filepath )
-
+        if __addon__.getSetting( "clean_title" ) == "true":
+            song.title = re.sub(r'\([^\)]*\)$', '', song.title)
+        
+        #Check if analyzing the stream is discouraged
+        do_not_analyze = xbmc.getInfoLabel('MusicPlayer.Property(do_not_analyze)')
+        if do_not_analyze == 'true':
+            song.analyze_safe = False
+        
         return song

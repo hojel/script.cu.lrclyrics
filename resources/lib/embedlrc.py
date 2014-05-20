@@ -2,6 +2,7 @@ import os
 import re
 import chardet
 from tagger import *
+from mutagen.flac import FLAC
 import xbmcvfs
 from utilities import *
 
@@ -10,7 +11,7 @@ __language__  = sys.modules[ "__main__" ].__language__
 def getEmbedLyrics(song, getlrc):
     lyrics = Lyrics()
     lyrics.song = song
-    lyrics.source = __language__( 30002 )
+    lyrics.source = __language__( 32002 )
     lyrics.lrc = getlrc
     filename = song.filepath.decode("utf-8")
     lry = None
@@ -25,7 +26,9 @@ def getEmbedLyrics(song, getlrc):
     else:
         lry = getID3Lyrics(filename, getlrc)
         if not lry:
-            return None
+            lry = getFlacLyrics(filename, getlrc)
+            if not lry:
+                return None
         lyrics.lyrics = lry
     return lyrics
 
@@ -127,7 +130,7 @@ def getID3Lyrics(filename, getlrc):
                 lyrics += "%s%s\r\n" % (ms2timestamp(timems), text.replace('\n','').replace('\r','').strip())
                 content = content[pos+5:]
             return lyrics
-        elif getlrc and tag.fid == txxx:
+        elif tag.fid == txxx:
             """
             Frame data in rawdata[]:
             Text encoding     $xx
@@ -145,7 +148,10 @@ def getID3Lyrics(filename, getlrc):
                 lyrics = raw[pos+1:]
                 if (enc == 'latin_1'):
                     enc = chardet.detect(lyrics)['encoding']
-                return lyrics.decode(enc)
+                lyr = lyrics.decode(enc)
+                match1 = re.compile('\[(\d+):(\d\d)(\.\d+|)\]').search(lyr)
+                if (getlrc and match1) or ((not getlrc) and (not match1)):
+                    return lyr
         elif (not getlrc) and tag.fid == uslt:
             """
             Frame data in rawdata[]:
@@ -167,3 +173,14 @@ def getID3Lyrics(filename, getlrc):
                 enc = chardet.detect(lyrics)['encoding']
             return lyrics.decode(enc)
     return None
+
+def getFlacLyrics(filename, getlrc):
+    try:
+        tags = FLAC(filename)
+        if tags.has_key('lyrics'):
+            lyr = tags['lyrics'][0]
+            match1 = re.compile('\[(\d+):(\d\d)(\.\d+|)\]').search(lyr)
+            if (getlrc and match1) or ((not getlrc) and (not match1)):
+                return lyr
+    except:
+        return None
